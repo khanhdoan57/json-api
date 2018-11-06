@@ -1,0 +1,13 @@
+{
+    "name": "hackerboy/json-api",
+    "description": "PHP JSON API implementation (server side)",
+    "type": "library",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "HackerBoy.com",
+            "email": "admin@hackerboy.com"
+        }
+    ],
+    "require": {}
+}
