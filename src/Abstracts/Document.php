@@ -42,7 +42,7 @@ abstract class Document implements \JsonSerializable {
     * @access protected
     * @var object|array
     */
-    protected $data;
+    protected $included;
 
     /**
     * Document errors
