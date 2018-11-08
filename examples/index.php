@@ -86,5 +86,5 @@ if ($case === 'single-resource') {
 
 }
 
-header('Content-Type', 'application/vnd.api+json');
+header('Content-Type: application/vnd.api+json');
 echo json_encode($document, JSON_PRETTY_PRINT);

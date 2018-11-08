@@ -37,6 +37,14 @@ abstract class Document implements \JsonSerializable {
     protected $data;
 
     /**
+    * Included data to encode
+    *
+    * @access protected
+    * @var object|array
+    */
+    protected $data;
+
+    /**
     * Document errors
     *
     * @access protected
@@ -51,6 +59,14 @@ abstract class Document implements \JsonSerializable {
     * @var object Meta element
     */
     protected $meta;
+
+    /**
+    * Document links
+    *
+    * @access protected
+    * @var object Meta element
+    */
+    protected $links;
 
     /**
     * Base API URL
