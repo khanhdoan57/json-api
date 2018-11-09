@@ -97,6 +97,43 @@ $document->setData([$post1, $post2]) // or ->setData($post) will also work
         ]));
 ```
 
+## Implement relationships
+Simply return an array in getRelationships() method
+
+```
+<?php
+
+namespace HackerBoy\JsonApi\Examples\Resources;
+
+use HackerBoy\JsonApi\Abstracts\Resource;
+
+class PostResource extends Resource {
+
+    protected $type = 'posts';
+
+    public function getId($post)
+    {
+        return $post->id;
+    } 
+
+    public function getAttributes($post)
+    {
+        return [
+            'title' => $post->title,
+            'content' => $post->content
+        ];
+    }
+
+    public function getRelationships($post)
+    {
+        return [
+            'comments' => $post->comments, // Collection of comment objects
+            'author' => $post->author // Or single author object
+        ];
+    }
+}
+```
+
 ## Easily create element for your document
 Suppose that we created a $document object
 
