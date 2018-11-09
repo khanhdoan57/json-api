@@ -72,6 +72,45 @@ if ($case === 'single-resource') {
         $post2
     ]);
 
+} elseif ($case === 'get-relationships') {
+
+    // To use with fetch relationships request like: /api/posts/1/relationships/comments
+    $document->setData([
+        $comment1, $comment2
+    ], 'relationship');
+
+} elseif ($case === 'show-an-error') {
+
+    $document->setErrors([
+        'code' => 123,
+        'status' => 500,
+        'title' => 'Error 500 example',
+        'detail' => 'These error fields are all optional, you may only set one.'
+    ]);
+
+    header('HTTP/1.1 500 Internal Server Error');
+
+} elseif ($case === 'show-errors') {
+
+    $document->setErrors([
+        [
+            'code' => 456,
+            'status' => 500,
+            'title' => 'Error 1',
+            'meta' => [
+                'key' => 'value'
+            ]
+        ],
+        [
+            'code' => 234,
+            'status' => 403,
+            'title' => 'Example error',
+            'detail' => 'Example error'
+        ]
+    ]);
+
+    header('HTTP/1.0 403 Forbidden');
+
 } else {
 
     $document->setData([

@@ -59,7 +59,7 @@ class UserController extends Controller {
          
         // Let's test it
         $document = new Document($config);
-        $document->setData($user)
+        $document->setData($user) // or set data as a collection by using ->setData($users)
                   ->setMeta(['key' => 'value']);
         
         return response()->json($document)->header('Content-Type', 'application/vnd.api+json');

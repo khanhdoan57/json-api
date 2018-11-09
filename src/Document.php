@@ -66,6 +66,11 @@ class Document extends Abstracts\Document {
     */
     public function setData($resource, $type = 'resource')
     {
+        // Check errors is set
+        if ($this->errors) {
+            throw new Exception('The members data and errors MUST NOT coexist in the same document.');
+        }
+
         $document = $this;
 
         $this->resourceHandler($resource, function($resource) use (&$document, $type) {
@@ -100,42 +105,80 @@ class Document extends Abstracts\Document {
     /**
     * Add errors to document
     *
-    * @param array|Iterator
+    * @param array|iterator|object Can be an instance or a collection of Element\Error, or simply an array of data
     * @return object this
     */
     public function setErrors($errors)
     {
+        // If data is set - errors cant be set
+        if ($this->data) {
+            throw new Exception('The members data and errors MUST NOT coexist in the same document.');
+        }
 
+        $this->errors = [];
+
+        // If errors is a single error
+        if ($errors instanceof Element\Error) {
+            $this->errors[] = $errors;
+        } else {
+
+            if (!is_iterable($errors)) {
+                throw new Exception('Invalid errors data');
+            }
+
+            foreach ($errors as $key => $error) {
+                
+                // Single error data
+                if (!is_integer($key)) {
+                    
+                    $this->errors[] = new Element\Error($errors, $this);
+                    break;
+
+                } elseif ($error instanceof Element\Error) {
+
+                    // Error elements are object
+                    $this->errors[] = $error;
+
+                } else {
+
+                    // Error elements are data
+                    $this->errors[] = new Element\Error($error, $this);
+                }
+
+            }
+        }
+
+        return $this;
     }
 
     /**
-    * Add errors to document
+    * Add meta to document
     *
-    * @param array|Iterator
+    * @param array|iterator|object
     * @return object this
     */
     public function setMeta($meta)
     {
-        $this->meta = new Element\Meta($meta, $this);
+        $this->meta = ($meta instanceof Element\Meta) ? $meta : new Element\Meta($meta, $this);
         return $this;
     }
 
     /**
     * Add links to document
     *
-    * @param array|Iterator
+    * @param array|iterator|object
     * @return object this
     */
     public function setLinks($links)
     {
-        $this->links = new Element\Links($links, $this);
+        $this->links = ($links instanceof Element\Links) ? $links : new Element\Links($links, $this);
         return $this;
     }
 
     /**
     * Add objects to included
     *
-    * @param Iterator|array
+    * @param object|iterator|array
     * @return object this
     */
     public function setIncluded($collection)
