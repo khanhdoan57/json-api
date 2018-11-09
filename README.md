@@ -188,6 +188,9 @@ $pagination = $document->makePagination([
         'prev' => $document->getUrl('prev-link'),
         'next' => $document->getUrl('last-link'),
     ]);
+
+// Attach pagination to document
+$document->setLinks($pagination);
 ```
 
 ### Create other elements
