@@ -21,7 +21,6 @@ class Document extends Abstracts\Document {
     * @param array A map of Model => Resource classes
     * @param object|array A model object or a collection
     */
-    private $config = [];
     public function __construct($config)
     {
         if (!is_array($config)) {
@@ -43,6 +42,14 @@ class Document extends Abstracts\Document {
         $this->resourceMap = $resourceMap;
 
         if ($apiUrl = @$config['api_url']) {
+
+            // Check valid URL
+            if (!filter_var($apiUrl, FILTER_VALIDATE_URL)) {
+                throw new Exception('Invalid API URL');
+            }
+
+            $apiUrl = rtrim($apiUrl, '/');
+
             $this->url = $apiUrl;
         }
 

@@ -56,7 +56,8 @@ $config = [
         Post::class => PostResource::class,
         Comment::class => CommentResource::class,
     ],
-    'api_url' => 'http://example.com',
+    'api_url' => 'http://example.com/',
+    'auto_set_links' => true
 ];
 
 $document = new HackerBoy\JsonApi\Document($config);
@@ -71,6 +72,15 @@ if ($case === 'single-resource') {
         $post1,
         $post2
     ]);
+
+    $pagination = $document->makePagination([
+        'first' => $document->getUrl('blah-blah'),
+        'last' => $document->getUrl('bloh-blah'),
+        'prev' => $document->getUrl('bleh-bloh'),
+        'next' => $document->getUrl('blah-bleh')
+    ]);
+
+    $document->setLinks($pagination);
 
 } elseif ($case === 'get-relationships') {
 
@@ -120,7 +130,7 @@ if ($case === 'single-resource') {
     ])->setMeta([
         'key' => 'value'
     ])->setLinks([
-        'next' => '/bullshit'
+        'self' => $document->getUrl('bullshit')
     ]);
 
 }

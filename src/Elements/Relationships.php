@@ -10,6 +10,7 @@
 namespace HackerBoy\JsonApi\Elements;
 
 use HackerBoy\JsonApi\Abstracts\Document;
+use HackerBoy\JsonApi\Abstracts\Resource;
 use HackerBoy\JsonApi\Abstracts\Element;
 use Exception;
 
@@ -18,7 +19,7 @@ class Relationships extends Element {
     /**
     * @inheritdoc
     */
-    public function __construct($relationships, Document $document)
+    public function __construct($relationships, Document $document, $parentResource = null)
     {
         $this->data = [];
 
@@ -91,6 +92,17 @@ class Relationships extends Element {
 
             // Save the data
             $this->data[$relationshipKey]['data'] = $data;
+
+            // If links not set and auto_set_links is on
+            if (!array_key_exists('links', $this->data[$relationshipKey]) 
+                and $document->getConfig('auto_set_links')
+                and $parentResource instanceof Resource
+            ) {
+                $this->data[$relationshipKey]['links'] = [
+                    'related' => $document->getUrl($parentResource->getType().'/'.$parentResource->getId($parentResource->getResourceObject()).'/'.$relationshipKey),
+                    'self' => $document->getUrl($parentResource->getType().'/'.$parentResource->getId($parentResource->getResourceObject()).'/relationships/'.$relationshipKey)
+                ];
+            }
         }
 
     }

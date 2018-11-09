@@ -29,6 +29,14 @@ abstract class Document implements \JsonSerializable {
     const MIXED_COLLECTION = 5; // Collection contain mixed resources
 
     /**
+    * Document configuration
+    *
+    * @access protected
+    * @var array
+    */
+    protected $config;
+
+    /**
     * Data to encode
     *
     * @access protected
@@ -83,6 +91,32 @@ abstract class Document implements \JsonSerializable {
     * @var array
     */
     protected $resourceMap;
+
+    /**
+    * Get document config
+    *
+    * @param string Config key
+    * @return mixed
+    */
+    final public function getConfig($key = '')
+    {
+        if (!$key) {
+            return $this->config;
+        }
+
+        return array_key_exists($key, $this->config) ? $this->config[$key] : null;
+    }
+
+    /**
+    * Get API Url
+    *
+    * @param string|void
+    * @return string
+    */
+    final public function getUrl($path = '')
+    {
+        return $this->url.'/'.$path;
+    }
 
     /**
     * Check resource / collection is valid
@@ -192,6 +226,28 @@ abstract class Document implements \JsonSerializable {
         }
 
         return new $this->resourceMap[get_class($resource)]($resource, $this);
+    }
+
+    /**
+    * Magic call to create element object
+    *
+    * @inheritdoc
+    */
+    final public function __call($method, $params)
+    {
+        if (preg_match('/make+/i', $method)) {
+            
+            $class = substr($method, 4);
+            $class = '\\HackerBoy\\JsonApi\\Elements\\'.$class;
+            $data = isset($params[0]) ? $params[0] : [];
+
+            if (class_exists($class)) {
+                return new $class($data, $this);
+            }
+
+        }
+
+        throw new Exception('Method '.$method.' does not exist');
     }
 
     /**

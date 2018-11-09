@@ -80,14 +80,31 @@ abstract class Resource implements \JsonSerializable {
     abstract public function getAttributes($resource);
 
     /**
-    * Pre-define resource relationships
+    * Define resource relationships
     *
-    * @param void
+    * @param object
     * @return array
     */
     public function getRelationships($resource)
     {
         return [];
+    }
+
+    /**
+    * Define resource links
+    *
+    * @param object
+    * @return array
+    */
+    public function getLinks($resource)
+    {
+        if (!$this->document->getConfig('auto_set_links')) {
+            return [];
+        }
+
+        return [
+            'self' => $this->document->getUrl($this->getType().'/'.$this->getId($resource))
+        ];
     }
 
     /**
@@ -100,7 +117,7 @@ abstract class Resource implements \JsonSerializable {
     final protected function getAbstractRelationships()
     {
         if ($relationships = $this->getRelationships($this->resource) and is_array($relationships) and count($relationships)) {
-            return new Relationships($relationships, $this->document);
+            return new Relationships($relationships, $this->document, $this);
         }
         
         return null;
@@ -123,6 +140,10 @@ abstract class Resource implements \JsonSerializable {
 
         if ($relationships = $this->getAbstractRelationships()) {
             $resource['relationships'] = $relationships;
+        }
+
+        if ($links = $this->getLinks($this->resource)) {
+            $resource['links'] = $links;
         }
 
         return $resource;

@@ -4,7 +4,7 @@
 * @author HackerBoy.com <admin@hackerboy.com>
 * @package hackerboy/json-api
 *
-* Link object
+* Error source object
 */
 
 namespace HackerBoy\JsonApi\Elements;
