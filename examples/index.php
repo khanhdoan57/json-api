@@ -56,7 +56,7 @@ $config = [
         Post::class => PostResource::class,
         Comment::class => CommentResource::class,
     ],
-    'api_url' => 'http://example.com/',
+    'api_url' => 'http://example.com/api',
     'auto_set_links' => true
 ];
 
@@ -121,7 +121,30 @@ if ($case === 'single-resource') {
 
     header('HTTP/1.0 403 Forbidden');
 
-} else {
+} elseif ($case === 'document-to-array') {
+
+    $document->setData([$post1, $post2]);
+
+    var_dump($document->toArray());
+    exit;
+
+} elseif ($case === 'element-to-array') {
+
+    $testElement = $document->makeMeta([
+        'test-key' => 'test to array function'
+    ]);
+
+    var_dump($testElement->toArray());
+    exit;
+
+} elseif ($case === 'resource-to-array') {
+
+    $postResource = new PostResource($post1, $document);
+
+    var_dump($postResource->toArray());
+    exit;
+
+} elseif ($case === 'default') {
 
     $document->setData([
         $post1, $post2
@@ -133,7 +156,23 @@ if ($case === 'single-resource') {
         'self' => $document->getUrl('bullshit')
     ]);
 
+} else {
+
+    echo '<h1>Examples:</h1><br />
+    <a href="?case=single-resource" target="_blank">Return data with a single resource</a><br />
+    <a href="?case=resource-collection" target="_blank">Return data with a collection of resource and pagination links</a><br />
+    <a href="?case=default" target="_blank">Return document with data, relationships, included data, meta and links</a><br />
+    <a href="?case=get-relationships" target="_blank">Return data as relationships</a><br />
+    <a href="?case=show-an-error" target="_blank">Return an error</a><br />
+    <a href="?case=show-errors" target="_blank">Return multiple errors</a><br />
+    <a href="?case=document-to-array" target="_blank">Test $document->toArray()</a><br />
+    <a href="?case=element-to-array" target="_blank">Test $element->toArray()</a><br />
+    <a href="?case=resource-to-array" target="_blank">Test $resource->toArray()</a><br />
+    ';
+
 }
 
-header('Content-Type: application/vnd.api+json');
-echo json_encode($document, JSON_PRETTY_PRINT);
+if ($case) {
+    header('Content-Type: application/vnd.api+json');
+    echo $document->toJson();
+}

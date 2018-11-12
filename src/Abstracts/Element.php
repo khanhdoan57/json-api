@@ -9,7 +9,11 @@
 
 namespace HackerBoy\JsonApi\Abstracts;
 
+use HackerBoy\JsonApi\Traits\AbstractDataConvert;
+
 abstract class Element implements \JsonSerializable {
+
+    use AbstractDataConvert;
 
     /**
     * Constructor
@@ -27,12 +31,4 @@ abstract class Element implements \JsonSerializable {
     */
     protected $data;
 
-    /**
-    * Element structure to be encoded with json_encode()
-    *
-    * @access public
-    * @param void
-    * @return array
-    */
-    abstract public function jsonSerialize();
 }

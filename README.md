@@ -1,6 +1,16 @@
 # Packagist: hackerboy/json-api
 Making JSON API implementation (server side) easiest for you 
 
+# Run examples:
+Guide to set up /examples/index.php to see some examples of uses.
+
+```
+git clone https://github.com/hackerboydotcom/json-api ./hackerboy-json-api;
+cd hackerboy-json-api;
+composer install --dev;
+```
+Then config your localhost nginx/apache to access [LOCALHOST_PATH]/examples/index.php
+
 # How to use?
 ## Create your resource schema
 For example, I'm gonna talk in a Laravel project context. Firstly, let's create a resource file: /app/Http/JsonApiResources/UserResource.php
@@ -70,12 +80,12 @@ class UserController extends Controller {
 
 ```
 
-## Set methods
+## Document set methods
 
 Available set methods from $document object are: 
 + setData($resourceOrCollection)
 + setIncluded($resourceOrCollection)
-+ setErrors($errors) // Array or HackerBoy\JsonApi\Elements\Error object - single error or multiple errors data will both works for this method
++ setErrors($errors) // Array or HackerBoy\JsonApi\Elements\Error object - single error or multiple errors data will both work for this method
 + setLinks($links) // Array of link data or HackerBoy\JsonApi\Elements\Links object
 + setMeta($meta) // Array of meta data or HackerBoy\JsonApi\Elements\Meta object
 
@@ -132,6 +142,23 @@ class PostResource extends Resource {
         ];
     }
 }
+```
+
+## Set data as relationships
+Second param allows you to set data as relationship (for request like: /api/posts/1/relationships/comments)
+```
+<?php
+
+// Set data as relationship
+$document->setData($resourceOrCollection, 'relationship');
+```
+
+## toArray() and toJson() method
+New methods in v1.1. Available for document, elements and resources objects
+```
+<?php
+$data = $document->toArray();
+$json = $document->toJson();
 ```
 
 ## Easily create element for your document
@@ -194,6 +221,15 @@ $document->setLinks($pagination);
 ```
 
 ### Create other elements
-It'll work the same way, available methods are: makeError(), makeErrorResource(), makeLink(), makeLinks(), makeMeta(), makePagination(), makeRelationship(), makeRelationships()
+It'll work the same way, available methods are: 
+
++ makeError(), 
++ makeErrorResource()
++ makeLink() (Create link object inside links data: https://jsonapi.org/format/#document-links)
++ makeLinks()
++ makePagination() (Make special Links object with pagination standard required)
++ makeMeta()
++ makeRelationship() (Create relationship object inside relationships data: https://jsonapi.org/format/#document-resource-object-relationships)
++ makeRelationships()
 
 You can see more examples in /examples/index.php

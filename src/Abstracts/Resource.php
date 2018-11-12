@@ -10,9 +10,12 @@
 namespace HackerBoy\JsonApi\Abstracts;
 
 use HackerBoy\JsonApi\Elements\Relationships;
+use HackerBoy\JsonApi\Traits\AbstractDataConvert;
 
 abstract class Resource implements \JsonSerializable {
     
+    use AbstractDataConvert;
+
     /**
     * Resource constructor
     *
@@ -130,7 +133,7 @@ abstract class Resource implements \JsonSerializable {
     * @param void
     * @return array
     */
-    public function jsonSerialize()
+    final public function jsonSerialize()
     {
         $resource = [
             'type' => $this->type,

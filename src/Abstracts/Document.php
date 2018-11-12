@@ -11,8 +11,11 @@ namespace HackerBoy\JsonApi\Abstracts;
 
 use Closure;
 use Exception;
+use HackerBoy\JsonApi\Traits\AbstractDataConvert;
 
 abstract class Document implements \JsonSerializable {
+
+    use AbstractDataConvert;
 
     /**
     * JSON API version
@@ -250,12 +253,6 @@ abstract class Document implements \JsonSerializable {
         throw new Exception('Method '.$method.' does not exist');
     }
 
-    /**
-    * Document structure to be encoded with json_encode()
-    *
-    * @access public
-    * @param void
-    * @return array
-    */
-    abstract public function jsonSerialize();
+    
+
 }
