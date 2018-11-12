@@ -85,7 +85,7 @@ class Document extends Abstracts\Document {
             if ($type === 'resource') {
                 $document->data = $document->getResourceInstance($resource);
             } elseif ($type === 'relationship') {
-                $document->data = new Element\Relationship($resource, $document);
+                $document->data = $document->makeRelationship($resource);
             }
 
         }, function($collection) use (&$document, $type) {
@@ -97,7 +97,7 @@ class Document extends Abstracts\Document {
                 if ($type === 'resource') {
                     $_resource = $document->getResourceInstance($resource);
                 } elseif ($type === 'relationship') {
-                    $_resource = new Element\Relationship($resource, $document);
+                    $_resource = $document->makeRelationship($resource);
                 }
 
                 $document->data[] = $_resource;
@@ -138,7 +138,7 @@ class Document extends Abstracts\Document {
                 // Single error data
                 if (!is_integer($key)) {
                     
-                    $this->errors[] = new Element\Error($errors, $this);
+                    $this->errors[] = $this->makeError($errors);
                     break;
 
                 } elseif ($error instanceof Element\Error) {
@@ -149,7 +149,7 @@ class Document extends Abstracts\Document {
                 } else {
 
                     // Error elements are data
-                    $this->errors[] = new Element\Error($error, $this);
+                    $this->errors[] = $this->makeError($error);
                 }
 
             }
@@ -166,7 +166,7 @@ class Document extends Abstracts\Document {
     */
     public function setMeta($meta)
     {
-        $this->meta = ($meta instanceof Element\Meta) ? $meta : new Element\Meta($meta, $this);
+        $this->meta = ($meta instanceof Element\Meta) ? $meta : $this->makeMeta($meta);
         return $this;
     }
 
@@ -178,7 +178,7 @@ class Document extends Abstracts\Document {
     */
     public function setLinks($links)
     {
-        $this->links = ($links instanceof Element\Links) ? $links : new Element\Links($links, $this);
+        $this->links = ($links instanceof Element\Links) ? $links : $this->makeLinks($links);
         return $this;
     }
 
@@ -198,12 +198,12 @@ class Document extends Abstracts\Document {
         $abstractCollection = [];
         if ($this->checkResource($collection) === self::IS_RESOURCE) {
 
-            $abstractCollection[] = new $this->resourceMap[get_class($collection)]($collection, $this);
+            $abstractCollection[] = $this->getResourceInstance($collection);
 
         } elseif (is_iterable($collection) and $this->checkResource($collection) === self::IS_COLLECTION) {
             
             foreach ($collection as $resource) {
-                $abstractCollection[] = new $this->resourceMap[get_class($resource)]($resource, $this);
+                $abstractCollection[] = $this->getResourceInstance($resource);
             }
 
         } else {

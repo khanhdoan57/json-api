@@ -42,7 +42,7 @@ class Links extends Element {
             } else {
 
                 // Parse link
-                $links[$key] = new Link($link, $document);
+                $links[$key] = $document->makeLink($link);
 
             }
 

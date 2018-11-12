@@ -34,11 +34,11 @@ class Error extends Element {
 
             } elseif ($key === 'meta') {
 
-                $this->data[$key] = new Meta($value, $document);
+                $this->data[$key] = $document->makeMeta($value);
 
             } elseif ($key === 'source') {
 
-                $this->data[$key] = new ErrorSource($value, $document);
+                $this->data[$key] = $document->makeErrorSource($value);
 
             }
 

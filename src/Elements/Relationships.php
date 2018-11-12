@@ -48,12 +48,12 @@ class Relationships extends Element {
                     if ($key === 'links') {
 
                         // Parse links object
-                        $this->data[$relationshipKey][$key] = new Links($value, $document);
+                        $this->data[$relationshipKey][$key] = $document->makeLinks($value);
 
                     } elseif ($key === 'meta') {
 
                         // Parse meta object
-                        $this->data[$relationshipKey][$key] = new Meta($value, $document);
+                        $this->data[$relationshipKey][$key] = $document->makeMeta($value);
 
                     } elseif ($key === 'data') {
 
@@ -78,14 +78,14 @@ class Relationships extends Element {
             $data = null;
             $document->resourceHandler($resource, function($resource) use (&$data, $document) {
 
-                $data = new Relationship($resource, $document);
+                $data = $document->makeRelationship($resource);
 
             }, function($collection) use (&$data, $document) {
 
                 $data = [];
 
                 foreach ($collection as $resource) {
-                    $data[] = new Relationship($resource, $document);
+                    $data[] = $document->makeRelationship($resource);
                 }
 
             });
