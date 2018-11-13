@@ -26,7 +26,7 @@ trait AbstractDataConvert {
     * @param void
     * @return array
     */
-    final public function toArray()
+    public function toArray()
     {
         return json_decode($this->toJson(0), true);
     }

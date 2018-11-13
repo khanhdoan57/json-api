@@ -1,5 +1,9 @@
 # Packagist: hackerboy/json-api
 Making JSON API implementation (server side) easiest for you 
+## Install
+```
+composer require hackerboy/json-api
+```
 
 # Run examples:
 Guide to set up /examples/index.php to see some examples of uses.

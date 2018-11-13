@@ -127,7 +127,7 @@ abstract class Document implements \JsonSerializable {
     * @param object|array Resource / Collection
     * @return constant
     */
-    public function checkResource($resource, $allowMixedCollection = false)
+    final public function checkResource($resource, $allowMixedCollection = false)
     {
         // Check if resource is valid
         if (is_object($resource) and array_key_exists(get_class($resource), $this->resourceMap) and is_subclass_of($this->resourceMap[get_class($resource)], Resource::class)) {
@@ -182,7 +182,7 @@ abstract class Document implements \JsonSerializable {
     * @param Closure Callback for collection
     * @return void
     */
-    public function resourceHandler($resource, Closure $resourceHandler, Closure $collectionHandler)
+    final public function resourceHandler($resource, Closure $resourceHandler, Closure $collectionHandler)
     {
         // Check resource
         $checkResource = $this->checkResource($resource);
@@ -202,7 +202,7 @@ abstract class Document implements \JsonSerializable {
             break;
 
             case self::INVALID_COLLECTION :
-                throw new Exception('Invalid resource collection');
+                throw new Exception('Invalid resource collection. Resource collection is not iterable or its containing invalid resource object.');
             break;
 
             case self::MIXED_COLLECTION :

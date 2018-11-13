@@ -200,7 +200,7 @@ class Document extends Abstracts\Document {
 
             $abstractCollection[] = $this->getResourceInstance($collection);
 
-        } elseif (is_iterable($collection) and $this->checkResource($collection) === self::IS_COLLECTION) {
+        } elseif (is_iterable($collection) and $this->checkResource($collection, true) === self::IS_COLLECTION) {
             
             foreach ($collection as $resource) {
                 $abstractCollection[] = $this->getResourceInstance($resource);

@@ -82,6 +82,11 @@ if ($case === 'single-resource') {
 
     $document->setLinks($pagination);
 
+} elseif ($case === 'test-included-mixed-resources') {
+
+    $document->setData($post1);
+    $document->setIncluded([$comment1, $comment2, $post2]);
+
 } elseif ($case === 'get-relationships') {
 
     // To use with fetch relationships request like: /api/posts/1/relationships/comments
@@ -163,6 +168,7 @@ if ($case === 'single-resource') {
     <a href="?case=resource-collection" target="_blank">Return data with a collection of resource and pagination links</a><br />
     <a href="?case=default" target="_blank">Return document with data, relationships, included data, meta and links</a><br />
     <a href="?case=get-relationships" target="_blank">Return data as relationships</a><br />
+    <a href="?case=test-included-mixed-resources" target="_blank">Test included data has mixed resources</a><br />
     <a href="?case=show-an-error" target="_blank">Return an error</a><br />
     <a href="?case=show-errors" target="_blank">Return multiple errors</a><br />
     <a href="?case=document-to-array" target="_blank">Test $document->toArray()</a><br />
