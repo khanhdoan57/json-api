@@ -24,7 +24,25 @@ class PostResource extends Resource {
     public function getRelationships($post)
     {
         return [
-            'comments' => $post->comments
+            'comments' => $post->comments,
+            /** or
+            'comments' => [
+                'meta' => [
+                    'key' => 'value'
+                ],
+                'links' => [
+                    'self' => '/path'
+                ],
+                'data' => $post->comments
+            ]
+            */
+        ];
+    }
+
+    public function getMeta($post)
+    {
+        return [
+            'post-meta-test' => 'This is title: '.$post->title
         ];
     }
 }

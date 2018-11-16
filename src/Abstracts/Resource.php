@@ -4,12 +4,13 @@
 * @author HackerBoy.com <admin@hackerboy.com>
 * @package hackerboy/json-api
 *
-* Document object
+* Resource abstract class
 */
 
 namespace HackerBoy\JsonApi\Abstracts;
 
 use HackerBoy\JsonApi\Elements\Relationships;
+use HackerBoy\JsonApi\Elements\Meta;
 use HackerBoy\JsonApi\Traits\AbstractDataConvert;
 
 abstract class Resource implements \JsonSerializable {
@@ -111,6 +112,34 @@ abstract class Resource implements \JsonSerializable {
     }
 
     /**
+    * Define resource meta data
+    *
+    * @param array
+    * @return this
+    */
+    public function getMeta($resource)
+    {
+        return [];        
+    }
+
+    /**
+    * Convert meta data to abstract object
+    *
+    * @param void
+    * @return object|null
+    */
+    final protected function getAbstractMeta()
+    {
+        $meta = $this->getMeta($this->resource);
+
+        if (!$meta) {
+            return null;
+        }
+
+        return ($meta instanceof Meta) ? $meta : $this->document->makeMeta($meta);
+    }
+
+    /**
     * Convert relationships data to relationships abstract object
     *
     * @access protected
@@ -119,8 +148,16 @@ abstract class Resource implements \JsonSerializable {
     */
     final protected function getAbstractRelationships()
     {
-        if ($relationships = $this->getRelationships($this->resource) and is_array($relationships) and count($relationships)) {
-            return new Relationships($relationships, $this->document, $this);
+        if ($relationships = $this->getRelationships($this->resource)) {
+
+            if ($relationships instanceof Relationships) {
+                return $relationships;
+            } 
+
+            if (is_array($relationships) and count($relationships)) {
+                return new Relationships($relationships, $this->document, $this);
+            }
+            
         }
         
         return null;
@@ -147,6 +184,10 @@ abstract class Resource implements \JsonSerializable {
 
         if ($links = $this->getLinks($this->resource)) {
             $resource['links'] = $links;
+        }
+
+        if ($meta = $this->getAbstractMeta()) {
+            $resource['meta'] = $meta;
         }
 
         return $resource;

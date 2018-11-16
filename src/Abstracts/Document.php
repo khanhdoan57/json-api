@@ -27,9 +27,18 @@ abstract class Document implements \JsonSerializable {
     */
     const IS_RESOURCE = 1; // Valid and is a resource 
     const IS_COLLECTION = 2; // Valid and is a collection
-    const INVALID_RESOURCE = 3; // Invalid resource
-    const INVALID_COLLECTION = 4; // Invalid collection
-    const MIXED_COLLECTION = 5; // Collection contain mixed resources
+    const IS_FLEXIBLE_RESOURCE = 3; // Is flexible resource
+    const IS_FLEXIBLE_RESOURCE_COLLECTION = 4; // Is flexible resource
+    const INVALID_RESOURCE = 5; // Invalid resource
+    const INVALID_COLLECTION = 6; // Invalid collection
+    const MIXED_COLLECTION = 7; // Collection contain mixed resources
+
+    /**
+    * Is this a flexible document?
+    *
+    * @access protected
+    */
+    protected $isFlexible = false;
 
     /**
     * Document configuration
@@ -107,6 +116,10 @@ abstract class Document implements \JsonSerializable {
             return $this->config;
         }
 
+        if (!$this->config) {
+            return null;
+        }
+
         return array_key_exists($key, $this->config) ? $this->config[$key] : null;
     }
 
@@ -122,6 +135,47 @@ abstract class Document implements \JsonSerializable {
     }
 
     /**
+    * Add resource to data
+    *
+    * @param object|array
+    * @param string Data type (resource|relationship) - default is resource
+    * @return object this
+    */
+    abstract public function setData($resource, $type = 'resource');
+
+    /**
+    * Add errors to document
+    *
+    * @param array|iterator|object Can be an instance or a collection of Element\Error, or simply an array of data
+    * @return object this
+    */
+    abstract public function setErrors($errors);
+
+    /**
+    * Add meta to document
+    *
+    * @param array|iterator|object
+    * @return object this
+    */
+    abstract public function setMeta($meta);
+
+    /**
+    * Add links to document
+    *
+    * @param array|iterator|object
+    * @return object this
+    */
+    abstract public function setLinks($links);
+
+    /**
+    * Add objects to included
+    *
+    * @param object|iterator|array
+    * @return object this
+    */
+    abstract public function setIncluded($collection);
+
+    /**
     * Check resource / collection is valid
     *
     * @param object|array Resource / Collection
@@ -129,6 +183,16 @@ abstract class Document implements \JsonSerializable {
     */
     final public function checkResource($resource, $allowMixedCollection = false)
     {
+        // Check if is flexible resource
+        if ($resource instanceof \HackerBoy\JsonApi\Flexible\Resource) {
+
+            if (!$this->isFlexible) {
+                throw new Exception('Flexible resource can only be used in flexible document');
+            }
+
+            return self::IS_FLEXIBLE_RESOURCE;
+        }
+
         // Check if resource is valid
         if (is_object($resource) and array_key_exists(get_class($resource), $this->resourceMap) and is_subclass_of($this->resourceMap[get_class($resource)], Resource::class)) {
             return self::IS_RESOURCE;
@@ -145,33 +209,48 @@ abstract class Document implements \JsonSerializable {
         $firstResource = null;
         foreach ($resource as $_resource) {
 
-            // Check resource valid
-            if ($this->checkResource($_resource) !== self::IS_RESOURCE) {
-                    
-                // Invalid collection
-                return self::INVALID_COLLECTION;
-
-            }
-            
             // Save first resource
             if (!$firstResource) {
 
                 $firstResource = $_resource;
                 continue;
 
+            } else {
+
+                // If first one is set
+                if (!in_array($this->checkResource($_resource), [self::IS_FLEXIBLE_RESOURCE, self::IS_RESOURCE])) {
+                    return self::INVALID_COLLECTION;
+                }
+
             }
 
-            // Check other resources the same as first one
-            if (!$allowMixedCollection and (get_class($_resource) !== get_class($firstResource))) {
-                return self::MIXED_COLLECTION;
-            }
+            if ($this->checkResource($_resource) !== self::IS_FLEXIBLE_RESOURCE) {
 
+                // Check resource valid
+                if ($this->checkResource($_resource) !== self::IS_RESOURCE) {
+                        
+                    // Invalid collection
+                    return self::INVALID_COLLECTION;
+
+                }
+
+                // Check other resources the same as first one
+                if (!$allowMixedCollection and (get_class($_resource) !== get_class($firstResource))) {
+                    return self::MIXED_COLLECTION;
+                }
+
+            }
 
         }
 
         // All good? 
-        return self::IS_COLLECTION;
-    
+        $result = $this->checkResource($firstResource) === self::IS_FLEXIBLE_RESOURCE ? self::IS_FLEXIBLE_RESOURCE_COLLECTION : self::IS_COLLECTION;
+            
+        if ($result === self::IS_FLEXIBLE_RESOURCE_COLLECTION and !$this->isFlexible) {
+            throw new Exception('Collection of flexible resource can only be used in flexible document');
+        }
+
+        return $result;
     }
 
     /**
@@ -194,6 +273,15 @@ abstract class Document implements \JsonSerializable {
             break;
 
             case self::IS_COLLECTION :
+                $collectionHandler($resource);
+            break;
+
+            case self::IS_FLEXIBLE_RESOURCE :
+                $resourceHandler($resource);
+
+            break;
+
+            case self::IS_FLEXIBLE_RESOURCE_COLLECTION :
                 $collectionHandler($resource);
             break;
 
@@ -224,7 +312,13 @@ abstract class Document implements \JsonSerializable {
     */
     final public function getResourceInstance($resource)
     {
-        if ($this->checkResource($resource) !== self::IS_RESOURCE) {
+        $checkResource = $this->checkResource($resource);
+
+        if ($checkResource === self::IS_FLEXIBLE_RESOURCE) {
+            return $resource;
+        }
+
+        if ($checkResource !== self::IS_RESOURCE) {
             throw new Exception('Invalid model object - cannot get resource instance');
         }
 

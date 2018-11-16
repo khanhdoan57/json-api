@@ -6,6 +6,7 @@ composer require hackerboy/json-api
 ```
 
 # Run examples:
+Example code: /example/index.php
 Guide to set up /examples/index.php to see some examples of uses.
 
 ```
@@ -38,6 +39,16 @@ class UserResource extends Resource {
         return [
             'name' => $user->name,
             'email' => $user->email
+        ];
+    }
+
+    /**
+    * Meta is optional
+    */
+    public function getMeta($user)
+    {
+        return [
+            'meta-is-optional' => $user->some_value
         ];
     }
 }
@@ -140,10 +151,19 @@ class PostResource extends Resource {
 
     public function getRelationships($post)
     {
-        return [
-            'comments' => $post->comments, // Collection of comment objects
-            'author' => $post->author // Or single author object
+        $relationships = [
+            'author' => $post->author // Post has relationship with author
         ];
+
+        // Check if post has comments
+        if (isset($post->comments) and count($post->comments)) {
+
+            // Add comments to relationships
+            $relationships['comments'] = $post->comments;
+
+        }
+
+        return $relationships;
     }
 }
 ```
@@ -158,7 +178,7 @@ $document->setData($resourceOrCollection, 'relationship');
 ```
 
 ## toArray() and toJson() method
-New methods in v1.1. Available for document, elements and resources objects
+New methods in v1.1. Available for document, elements and resources
 ```
 <?php
 $data = $document->toArray();
@@ -237,3 +257,37 @@ It'll work the same way, available methods are:
 + makeRelationships()
 
 You can see more examples in /examples/index.php
+
+## Flexible document object
+Flexible document can be used exactly like normal document, but $config is optional, flexible resource allowed... You can consider it as a "free schema" version of document.
+Flexible document can use $config as normal document, then you can use it to work with flexible resource and mapped resource in the same document.
+Flexible document might be helpful for projects with no ORM, build JSON API data quickly without configuration, build JSON API data to POST to another JSON API endpoint...
+Flexible document is not recommended anyway, as it allows to build a document in a free way and may cause unpredicted errors to your API like missing elements, invalid format...etc... So use it carefully and wisely
+
+### Example of flexible document use
+
+```
+<?php
+
+$flexibleDocument = new HackerBoy\JsonApi\Flexible\Document; // $config is the same format with normal document but it is optional
+
+// Create a flexible resource
+$flexibleResource = $flexibleDocument->makeFlexibleResource();
+$flexibleResource->setId(1234);
+                ->setType('flexible')
+                ->setAttributes([
+                        'attribute_name' => 'attribute value'
+                    ])
+                ->setMeta([
+                        'meta-key' => 'meta value'
+                    ])
+                ->setLinks([
+                        'self' => '/link'
+                    ]);
+
+// Attach flexible resource to document
+$flexibleDocument->setData($flexibleResource); // You can put in a collection as well, all other methods are the same
+
+echo $flexibleDocument->toJson();
+
+```
