@@ -6,8 +6,8 @@ composer require hackerboy/json-api
 ```
 
 # Run examples:
-Example code: /example/index.php
-Guide to set up /examples/index.php to see some examples of uses.
+- Example code: /example/index.php
+- Guide to set up /examples/index.php to see some examples of uses.
 
 ```
 git clone https://github.com/hackerboydotcom/json-api ./hackerboy-json-api;
@@ -259,10 +259,10 @@ It'll work the same way, available methods are:
 You can see more examples in /examples/index.php
 
 ## Flexible document object
-Flexible document can be used exactly like normal document, but $config is optional, flexible resource allowed... You can consider it as a "free schema" version of document.
-Flexible document can use $config as normal document, then you can use it to work with flexible resource and mapped resource in the same document.
-Flexible document might be helpful for projects with no ORM, build JSON API data quickly without configuration, build JSON API data to POST to another JSON API endpoint...
-Flexible document is not recommended anyway, as it allows to build a document in a free way and may cause unpredicted errors to your API like missing elements, invalid format...etc... So use it carefully and wisely
+- Flexible document can be used exactly like normal document, but $config is optional, flexible resource allowed... You can consider it as a "free schema" version of document.
+- Flexible document can use $config as normal document, then you can use it to work with flexible resource and mapped resource in the same document.
+- Flexible document might be helpful for projects with no ORM, build JSON API data quickly without configuration, build JSON API data to POST to another JSON API endpoint...
+- Flexible document is not recommended anyway, as it allows to build a document in a free way and may cause unpredicted errors to your API like missing elements, invalid format...etc... So use it carefully and wisely
 
 ### Example of flexible document use
 
