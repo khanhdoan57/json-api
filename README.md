@@ -95,14 +95,22 @@ class UserController extends Controller {
 
 ```
 
-## Document set methods
+## Document set & add methods
 
-Available set methods from $document object are: 
-+ setData($resourceOrCollection)
+The difference between "set methods" and "add methods" are is: "Set methods" will override the data while "add methods" will append to data.
+
+Available "set" methods from $document object are: 
++ setData($resourceOrCollection, $type = 'resource') // Default $type = 'resource', in case you need to return data as relationship object, change $type to 'relationship'
 + setIncluded($resourceOrCollection)
 + setErrors($errors) // Array or HackerBoy\JsonApi\Elements\Error object - single error or multiple errors data will both work for this method
 + setLinks($links) // Array of link data or HackerBoy\JsonApi\Elements\Links object
 + setMeta($meta) // Array of meta data or HackerBoy\JsonApi\Elements\Meta object
+
+Available "add" methods from $document object are:
++ addIncluded($resourceOrCollection)
++ addErrors($errors) // Array or HackerBoy\JsonApi\Elements\Error object - single error or multiple errors data will both work for this method
++ addLinks($links) // Array of link data or HackerBoy\JsonApi\Elements\Links object
++ addMeta($meta) // Array of meta data or HackerBoy\JsonApi\Elements\Meta object
 
 Example:
 ```

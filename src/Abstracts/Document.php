@@ -135,7 +135,7 @@ abstract class Document implements \JsonSerializable {
     }
 
     /**
-    * Add resource to data
+    * Set resource to data
     *
     * @param object|array
     * @param string Data type (resource|relationship) - default is resource
@@ -144,12 +144,51 @@ abstract class Document implements \JsonSerializable {
     abstract public function setData($resource, $type = 'resource');
 
     /**
+    * Set errors to document
+    *
+    * @param array|iterator|object Can be an instance or a collection of Element\Error, or simply an array of data
+    * @param bool Override current value
+    * @return object this
+    */
+    abstract public function setErrors($errors, $override = true);
+
+    /**
+    * Set meta to document
+    *
+    * @param array|iterator|object
+    * @param bool Override current value
+    * @return object this
+    */
+    abstract public function setMeta($meta, $override = true);
+
+    /**
+    * Set links to document
+    *
+    * @param array|iterator|object
+    * @param bool Override current value
+    * @return object this
+    */
+    abstract public function setLinks($links, $override = true);
+
+    /**
+    * Set objects to included
+    *
+    * @param object|iterator|array
+    * @param bool Override current value
+    * @return object this
+    */
+    abstract public function setIncluded($collection, $override = true);
+
+    /**
     * Add errors to document
     *
     * @param array|iterator|object Can be an instance or a collection of Element\Error, or simply an array of data
     * @return object this
     */
-    abstract public function setErrors($errors);
+    public function addErrors($errors)
+    {
+        return $this->setErrors($errors, false);
+    }
 
     /**
     * Add meta to document
@@ -157,7 +196,10 @@ abstract class Document implements \JsonSerializable {
     * @param array|iterator|object
     * @return object this
     */
-    abstract public function setMeta($meta);
+    public function addMeta($meta)
+    {
+        return $this->setMeta($meta, false);
+    }
 
     /**
     * Add links to document
@@ -165,7 +207,10 @@ abstract class Document implements \JsonSerializable {
     * @param array|iterator|object
     * @return object this
     */
-    abstract public function setLinks($links);
+    public function addLinks($links)
+    {
+        return $this->setLinks($links, false);
+    }
 
     /**
     * Add objects to included
@@ -173,7 +218,10 @@ abstract class Document implements \JsonSerializable {
     * @param object|iterator|array
     * @return object this
     */
-    abstract public function setIncluded($collection);
+    public function addIncluded($collection)
+    {
+        return $this->setIncluded($collection, false);
+    }
 
     /**
     * Check resource / collection is valid

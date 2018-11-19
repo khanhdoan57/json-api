@@ -110,19 +110,18 @@ class Document extends Abstracts\Document {
     }
 
     /**
-    * Add errors to document
-    *
-    * @param array|iterator|object Can be an instance or a collection of Element\Error, or simply an array of data
-    * @return object this
+    * @inheritdoc
     */
-    public function setErrors($errors)
+    public function setErrors($errors, $override = true)
     {
         // If data is set - errors cant be set
         if ($this->data) {
             throw new Exception('The members data and errors MUST NOT coexist in the same document.');
         }
 
-        $this->errors = [];
+        if ($this->override or !is_array($this->errors)) {
+            $this->errors = [];
+        }
 
         // If errors is a single error
         if ($errors instanceof Element\Error) {
@@ -138,18 +137,30 @@ class Document extends Abstracts\Document {
                 // Single error data
                 if (!is_integer($key)) {
                     
-                    $this->errors[] = $this->makeError($errors);
+                    $_error = $this->makeError($errors);
+
+                    if (!in_array($_error, $this->errors)) {
+                        $this->errors[] = $_error;
+                    }
+
                     break;
 
                 } elseif ($error instanceof Element\Error) {
 
                     // Error elements are object
-                    $this->errors[] = $error;
+                    if (!in_array($_error, $this->errors)) {
+                        $this->errors[] = $error;
+                    }
 
                 } else {
 
                     // Error elements are data
-                    $this->errors[] = $this->makeError($error);
+                    $_error = $this->makeError($error);
+
+                    if (!in_array($_error, $this->errors)) {
+                        $this->errors[] = $_error;
+                    }
+
                 }
 
             }
@@ -159,39 +170,55 @@ class Document extends Abstracts\Document {
     }
 
     /**
-    * Add meta to document
-    *
-    * @param array|iterator|object
-    * @return object this
+    * @inheritdoc
     */
-    public function setMeta($meta)
+    public function setMeta($meta, $override = true)
     {
-        $this->meta = ($meta instanceof Element\Meta) ? $meta : $this->makeMeta($meta);
+        if ($override or !$this->meta) {
+            $this->meta = ($meta instanceof Element\Meta) ? $meta : $this->makeMeta($meta);
+        } else {
+
+            if (!($meta instanceof Element\Meta)) {
+                $meta = $this->makeMeta($meta);
+            }
+
+            $this->meta = $this->makeMeta(array_merge($this->meta->toArray(), $meta->toArray()));
+
+        }
+        
         return $this;
     }
 
     /**
-    * Add links to document
-    *
-    * @param array|iterator|object
-    * @return object this
+    * @inheritdoc
     */
-    public function setLinks($links)
-    {
-        $this->links = ($links instanceof Element\Links) ? $links : $this->makeLinks($links);
+    public function setLinks($links, $override = true)
+    {   
+        if (!$override or !$this->links) {
+            $this->links = ($links instanceof Element\Links) ? $links : $this->makeLinks($links);
+        } else {
+
+            if (!($links instanceof Element\Links)) {
+                $links = $this->makeLinks($links);
+            }
+
+            $this->links = $this->makeLinks(array_merge($this->links->toArray(), $links->toArray()));
+        }
+        
         return $this;
     }
 
     /**
-    * Add objects to included
-    *
-    * @param object|iterator|array
-    * @return object this
+    * @inheritdoc
     */
-    public function setIncluded($collection)
+    public function setIncluded($collection, $override = true)
     {
         if (!$this->data) {
             throw new Exception('Document data is not set yet - included data must not be set');
+        }
+
+        if (!$this->included) {
+            $this->included = [];
         }
 
         // Check valid included
@@ -210,7 +237,21 @@ class Document extends Abstracts\Document {
             throw new Exception('Included data must be a valid collection');
         }
 
-        $this->included = $abstractCollection;
+        if ($override) {
+            $this->included = $abstractCollection;
+        } else {
+
+            // Check existing object
+            foreach ($abstractCollection as $key => $resource) {
+                    
+                if (in_array($resource, $this->included)) {
+                    unset($abstractCollection[$key]);
+                }
+
+            }
+
+            $this->included = array_merge($this->included, $abstractCollection);
+        }
 
         return $this;
     }

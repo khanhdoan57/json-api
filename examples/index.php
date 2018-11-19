@@ -42,11 +42,16 @@ if ($case === 'single-resource') {
     ]);
 
     $document->setLinks($pagination);
+    $document->addLinks([
+        'test-add-links' => '/add-methods-will-append'
+    ]);
 
 } elseif ($case === 'test-included-mixed-resources') {
 
     $document->setData($post1);
-    $document->setIncluded([$comment1, $comment2, $post2]);
+    $document->setIncluded([$comment1, $comment2]);
+    $document->addIncluded($post2);
+    $document->addIncluded($post2);
 
 } elseif ($case === 'get-relationships') {
 
@@ -85,6 +90,10 @@ if ($case === 'single-resource') {
         ]
     ]);
 
+    $document->addErrors([
+        'title' => 'Add another error'
+    ]);
+
     header('HTTP/1.0 403 Forbidden');
 
 } elseif ($case === 'document-to-array') {
@@ -118,8 +127,12 @@ if ($case === 'single-resource') {
         $comment1, $comment2, $comment3
     ])->setMeta([
         'key' => 'value'
+    ])->addMeta([
+        'add-meta' => 'Added by add method'
     ])->setLinks([
         'self' => $document->getUrl('bullshit')
+    ])->addLinks([
+        'test' => '/added-by-add-method'
     ]);
 
 } elseif ($case === 'single-flexible-resource') {
