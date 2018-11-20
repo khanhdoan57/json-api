@@ -240,23 +240,46 @@ class Document extends Abstracts\Document {
         if ($override) {
             $this->included = $abstractCollection;
         } else {
+            $this->included = array_merge($this->included, $abstractCollection);
+        }
 
-            // Check existing object
-            foreach ($abstractCollection as $key => $resource) {
-                
-                foreach ($this->included as $existingResource) {
-                        
-                    if ($resource->getId($resource->getResourceObject()) === $existingResource->getId($resource->getResourceObject())
-                        and $resource->getType() === $existingResource->getType()
+        // Re-sort included data
+        $this->included = array_values($this->included);
+
+        // Check duplicated objects
+        $continue = true;
+
+        while ($continue) {
+
+            $found = false;
+
+            foreach ($this->included as $key => $resource) {
+
+                foreach ($this->included as $_key => $_resource) {
+                    
+                    // Skip itself
+                    if ($key === $_key) {
+                        continue;
+                    }
+
+                    // Same object - check by id and type
+                    if ($resource->getType() === $_resource->getType()
+                        and $resource->getId($resource->getResourceObject()) === $_resource->getId($_resource->getResourceObject())
                     ) {
-                        unset($abstractCollection[$key]);
+                        $found = true;
+                        unset($this->included[$_key]);
                     }
 
                 }
 
+                if ($found) {
+                    break;
+                }
+
             }
 
-            $this->included = array_merge($this->included, $abstractCollection);
+            $continue = $found ? true : false;
+
         }
 
         return $this;
