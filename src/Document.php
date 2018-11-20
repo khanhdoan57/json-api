@@ -243,13 +243,13 @@ class Document extends Abstracts\Document {
             $this->included = array_merge($this->included, $abstractCollection);
         }
 
-        // Re-sort included data
-        $this->included = array_values($this->included);
-
         // Check duplicated objects
         $continue = true;
 
         while ($continue) {
+
+            // Re-sort included data
+            $this->included = array_values($this->included);
 
             $found = false;
 
