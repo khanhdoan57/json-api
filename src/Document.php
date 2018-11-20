@@ -243,9 +243,15 @@ class Document extends Abstracts\Document {
 
             // Check existing object
             foreach ($abstractCollection as $key => $resource) {
-                    
-                if (in_array($resource, $this->included)) {
-                    unset($abstractCollection[$key]);
+                
+                foreach ($this->included as $existingResource) {
+                        
+                    if ($resource->getId($resource->getResourceObject()) === $existingResource->getId($resource->getResourceObject())
+                        and $resource->getType() === $existingResource->getType()
+                    ) {
+                        unset($abstractCollection[$key]);
+                    }
+
                 }
 
             }
