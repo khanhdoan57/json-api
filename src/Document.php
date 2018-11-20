@@ -248,9 +248,6 @@ class Document extends Abstracts\Document {
 
         while ($continue) {
 
-            // Re-sort included data
-            $this->included = array_values($this->included);
-
             $found = false;
 
             foreach ($this->included as $key => $resource) {
@@ -281,6 +278,9 @@ class Document extends Abstracts\Document {
             $continue = $found ? true : false;
 
         }
+
+        // Re-sort included data
+        $this->included = array_values($this->included);
 
         return $this;
     }
