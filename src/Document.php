@@ -119,7 +119,7 @@ class Document extends Abstracts\Document {
             throw new Exception('The members data and errors MUST NOT coexist in the same document.');
         }
 
-        if ($this->override or !is_array($this->errors)) {
+        if ($override) {
             $this->errors = [];
         }
 
