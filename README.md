@@ -28,7 +28,7 @@ Then config your localhost nginx/apache to access [LOCALHOST_PATH]/examples/inde
         - [Create errors](#create-errors)
         - [Create links](#create-links)
         - [Create other elements](#create-other-elements)
-    - [Flexible document](#flexible-document)
+    - [Flexible document and resources](#flexible-document)
         - [Example of flexible document use](#example-of-flexible-document-use)
 
 
@@ -278,7 +278,7 @@ It'll work the same way, available methods are:
 
 You can see more examples in /examples/index.php
 
-## Flexible document object
+## Flexible document and resources
 - Flexible document can be used exactly like normal document, but $config is optional, flexible resource allowed... You can consider it as a "free schema" version of document.
 - Flexible document can use $config as normal document, then you can use it to work with flexible resource and mapped resource in the same document.
 - Flexible document might be helpful for projects with no ORM, build JSON API data quickly without configuration, build JSON API data to POST to another JSON API endpoint...
