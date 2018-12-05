@@ -16,6 +16,12 @@ composer install --dev;
 ```
 Then config your localhost nginx/apache to access [LOCALHOST_PATH]/examples/index.php
 
+# Table of Contents
+- [How to use?](#how-to-use)
+    - [Create your resource schema](#create-your-resource-schema)
+    - [Configuration and mapping your resources](#configuration-and-mapping-your-resources)
+    - [Document set and add methods](#document-set-and-add-methods)
+
 # How to use?
 ## Create your resource schema
 For example, I'm gonna talk in a Laravel project context. Firstly, let's create a resource file: /app/Http/JsonApiResources/UserResource.php
@@ -95,7 +101,7 @@ class UserController extends Controller {
 
 ```
 
-## Document set & add methods
+## Document set and add methods
 
 The difference between "set methods" and "add methods" are is: "Set methods" will override the data while "add methods" will append to data.
 
@@ -160,16 +166,12 @@ class PostResource extends Resource {
     public function getRelationships($post)
     {
         $relationships = [
-            'author' => $post->author // Post has relationship with author
+            'author' => $post->author, // Post has relationship with author
+
+            // If post has comments, return a collection
+            // Not? Return a blank array (implement empty to-many relationship)
+            'comments' => $post->comments ? $post->comments : []
         ];
-
-        // Check if post has comments
-        if (isset($post->comments) and count($post->comments)) {
-
-            // Add comments to relationships
-            $relationships['comments'] = $post->comments;
-
-        }
 
         return $relationships;
     }

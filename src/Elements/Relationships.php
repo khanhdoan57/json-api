@@ -74,21 +74,29 @@ class Relationships extends Element {
             
             }
 
-            // Check resource
+            // Relationship data
             $data = null;
-            $document->resourceHandler($resource, function($resource) use (&$data, $document) {
 
-                $data = $document->makeRelationship($resource);
+            // If resource is not
+            if ($resource !== null) {
 
-            }, function($collection) use (&$data, $document) {
+                // Check resource
+                $document->resourceHandler($resource, function($resource) use (&$data, $document) {
 
-                $data = [];
+                    $data = $document->makeRelationship($resource);
 
-                foreach ($collection as $resource) {
-                    $data[] = $document->makeRelationship($resource);
-                }
+                }, function($collection) use (&$data, $document) {
 
-            });
+                    $data = [];
+
+                    foreach ($collection as $resource) {
+                        $data[] = $document->makeRelationship($resource);
+                    }
+
+                });
+
+            }
+            
 
             // Save the data
             $this->data[$relationshipKey]['data'] = $data;
