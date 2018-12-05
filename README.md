@@ -21,6 +21,16 @@ Then config your localhost nginx/apache to access [LOCALHOST_PATH]/examples/inde
     - [Create your resource schema](#create-your-resource-schema)
     - [Configuration and mapping your resources](#configuration-and-mapping-your-resources)
     - [Document set and add methods](#document-set-and-add-methods)
+    - [Implement relationships](#implement-relationships)
+    - [Set data as relationships](#set-data-as-relationships)
+    - [toArray() and toJson() methods](#toarray-and-tojson-methods)
+    - [Easily create elements for your document](#easily-create-elements-for-your-document)
+        - [Create errors](#create-errors)
+        - [Create links](#create-links)
+        - [Create other elements](#create-other-elements)
+    - [Flexible document](#flexible-document)
+        - [Example of flexible document use](#example-of-flexible-document-use)
+
 
 # How to use?
 ## Create your resource schema
@@ -187,7 +197,7 @@ Second param allows you to set data as relationship (for request like: /api/post
 $document->setData($resourceOrCollection, 'relationship');
 ```
 
-## toArray() and toJson() method
+## toArray() and toJson() methods
 New methods in v1.1. Available for document, elements and resources
 ```
 <?php
@@ -195,10 +205,10 @@ $data = $document->toArray();
 $json = $document->toJson();
 ```
 
-## Easily create element for your document
+## Easily create elements for your document
 Suppose that we created a $document object
 
-### Create error
+### Create errors
 ```
 <?php
 
