@@ -28,7 +28,7 @@ Then config your localhost nginx/apache to access [LOCALHOST_PATH]/examples/inde
         - [Create errors](#create-errors)
         - [Create links](#create-links)
         - [Create other elements](#create-other-elements)
-    - [Flexible document and resources](#flexible-document)
+    - [Flexible document and resources](#flexible-document-and-resources)
         - [Example of flexible document use](#example-of-flexible-document-use)
 
 
