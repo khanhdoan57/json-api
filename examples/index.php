@@ -31,6 +31,7 @@ if ($case === 'single-resource') {
 
     $document->setData([
         $post1,
+        $post1,
         $post2
     ]);
 

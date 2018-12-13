@@ -150,6 +150,10 @@ abstract class Resource implements \JsonSerializable {
     {
         if ($relationships = $this->getRelationships($this->resource)) {
 
+            if (array_key_exists('id', $relationships) or array_key_exists('type', $relationships)) {
+                throw new \Exception('JSON-API resources cannot have an attribute or relationship named type or id. Check https://jsonapi.org/format/#document-resource-object-fields');
+            }
+
             if ($relationships instanceof Relationships) {
                 return $relationships;
             } 
@@ -172,10 +176,16 @@ abstract class Resource implements \JsonSerializable {
     */
     final public function jsonSerialize()
     {
+        $attributes = $this->getAttributes($this->resource);
+
+        if (array_key_exists('id', $attributes) or array_key_exists('type', $attributes)) {
+            throw new \Exception('JSON-API resources cannot have an attribute or relationship named type or id. Check https://jsonapi.org/format/#document-resource-object-fields');
+        }
+
         $resource = [
             'type' => $this->type,
             'id' => $this->getId($this->resource),
-            'attributes' => $this->getAttributes($this->resource)  
+            'attributes' => $attributes
         ];
 
         if ($relationships = $this->getAbstractRelationships()) {

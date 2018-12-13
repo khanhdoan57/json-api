@@ -92,6 +92,8 @@ class Document extends Abstracts\Document {
 
             $document->data = [];
 
+            $preventDuplicatedResources = [];
+
             foreach ($collection as $resource) {
 
                 if ($type === 'resource') {
@@ -99,6 +101,14 @@ class Document extends Abstracts\Document {
                 } elseif ($type === 'relationship') {
                     $_resource = $document->makeRelationship($resource);
                 }
+
+                // If data had this resource
+                $resourceKey = $_resource->getType().'-'.$_resource->getId($resource);
+                if (in_array($resourceKey, $preventDuplicatedResources)) {
+                    continue;
+                }
+
+                $preventDuplicatedResources[] = $resourceKey;
 
                 $document->data[] = $_resource;
 
