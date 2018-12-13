@@ -31,7 +31,7 @@ if ($case === 'single-resource') {
 
     $document->setData([
         $post1,
-        $post1,
+        $post1, // Duplicated resource wont be added
         $post2
     ]);
 

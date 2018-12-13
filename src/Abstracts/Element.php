@@ -31,4 +31,15 @@ abstract class Element implements \JsonSerializable {
     */
     protected $data;
 
+    /**
+    * Get data for public access
+    *
+    * @access public
+    * @return array
+    */
+    public function getData()
+    {
+        return $this->data;
+    }
+
 }
