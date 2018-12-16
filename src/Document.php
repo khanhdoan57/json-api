@@ -223,6 +223,11 @@ class Document extends Abstracts\Document {
     */
     public function setIncluded($collection, $override = true)
     {
+        // If null or empty array
+        if (!$collection or !count($collection)) {
+            return $this;
+        }
+
         if (!$this->data) {
             throw new Exception('Document data is not set yet - included data must not be set');
         }
