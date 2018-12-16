@@ -52,7 +52,9 @@ if ($case === 'single-resource') {
     $document->setData($post1);
     $document->setIncluded([$comment1, $comment2]);
     $document->addIncluded($post2);
-    $document->addIncluded($post2);
+    $document->addIncluded($post2); // Duplicated - wont be added twice
+    $document->addIncluded(null); // This code will be ignored
+    $document->addIncluded([]); // This code will be ignored
 
 } elseif ($case === 'get-relationships') {
 

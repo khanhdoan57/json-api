@@ -224,7 +224,7 @@ class Document extends Abstracts\Document {
     public function setIncluded($collection, $override = true)
     {
         // If null or empty array
-        if (!$collection or !count($collection)) {
+        if (!$collection or (is_iterable($collection) and !count($collection))) {
             return $this;
         }
 
