@@ -103,7 +103,7 @@ class Document extends Abstracts\Document {
                 }
 
                 // If data had this resource
-                $resourceKey = ($type === 'resource') ? $_resource->getType().'-'.$_resource->getId($resource) : $_resource->getData()->getType.'-'.$_resource->getData()->getId($_resource->getData()->getResourceObject());
+                $resourceKey = ($type === 'resource') ? $_resource->getType().'-'.$_resource->getId($resource) : $_resource->getData()->getType().'-'.$_resource->getData()->getId($_resource->getData()->getResourceObject());
                 if (in_array($resourceKey, $preventDuplicatedResources)) {
                     continue;
                 }
