@@ -312,7 +312,7 @@ abstract class Document implements \JsonSerializable {
     final public function resourceHandler($resource, Closure $resourceHandler, Closure $collectionHandler)
     {
         // Check resource
-        $checkResource = $this->checkResource($resource);
+        $checkResource = $this->checkResource($resource, $this->isFlexible); // If document is flexible, then $allowMixedCollection is true
 
         switch ($checkResource) {
 
