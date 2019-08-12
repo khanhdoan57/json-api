@@ -135,6 +135,17 @@ abstract class Document implements \JsonSerializable {
     }
 
     /**
+    * Get API Url
+    *
+    * @param string|void
+    * @return string
+    */
+    final public function setUrl($url)
+    {
+        return $this->url = rtrim($url, '/');
+    }
+
+    /**
     * Set resource to data
     *
     * @param object|array

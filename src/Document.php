@@ -43,11 +43,6 @@ class Document extends Abstracts\Document {
 
         if ($apiUrl = @$config['api_url']) {
 
-            // Check valid URL
-            if (!filter_var($apiUrl, FILTER_VALIDATE_URL)) {
-                throw new Exception('Invalid API URL');
-            }
-
             $apiUrl = rtrim($apiUrl, '/');
 
             $this->url = $apiUrl;
