@@ -24,7 +24,7 @@ class Pagination extends Links {
             throw new Exception('Pagination data must be an array');
         }
 
-        $requiredKeys = ['first', 'last', 'prev', 'next'];
+        $requiredKeys = ['first', 'last'];
 
         foreach ($requiredKeys as $key) {
             

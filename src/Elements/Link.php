@@ -20,35 +20,47 @@ class Link extends Element {
     */
     public function __construct($link, Document $document)
     {
-        if (!is_array($link)) {
-            throw new Exception('Link data must be an array');
+        if (!$link) {
+            $link = null;
         }
 
-        if (!array_key_exists('href', $link)) {
-            throw new Exception('Link data must contain href as a valid URL');
+        if ($link !== null) {
+
+            if (!is_array($link)) {
+                throw new Exception('Link data must be an array');
+            }
+
+            if (!array_key_exists('href', $link)) {
+                throw new Exception('Link data must contain href as a valid URL');
+            }
+
         }
 
         // Check data valid
-        foreach ($link as $key => $value) {
+        if (is_iterable($link)) {
 
-            if (!is_string($key)) {
-                throw new Exception('Link data key must be string');
-            }
-                
-            if ($key === 'href') {
+            foreach ($link as $key => $value) {
 
-                // Check valid URL
-                if (!preg_match('/\//', $value) and !filter_var($value, FILTER_VALIDATE_URL)) {
-                    throw new Exception($value.' is not a valid url.');
+                if (!is_string($key)) {
+                    throw new Exception('Link data key must be string');
                 }
 
-            } elseif ($key === 'meta') {
+                if ($key === 'href') {
 
-                // Parse meta object
-                $link[$key] = new Meta($value, $document);
+                    // Check valid URL
+                    if (!preg_match('/\//', $value) and !filter_var($value, FILTER_VALIDATE_URL) and $value !== null) {
+                        throw new Exception($value.' is not a valid url.');
+                    }
 
-            } else {
-                throw new Exception('Link data cannot contain key: '.$key);
+                } elseif ($key === 'meta') {
+
+                    // Parse meta object
+                    $link[$key] = new Meta($value, $document);
+
+                } else {
+                    throw new Exception('Link data cannot contain key: '.$key);
+                }
+
             }
 
         }
