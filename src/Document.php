@@ -84,7 +84,7 @@ class Document extends Abstracts\Document {
 
             if ($type === 'resource') {
                 $document->data = $document->getResourceInstance($resource);
-            } elseif ($type === 'relationship') {
+            } elseif ($type === 'relationship' || $type === 'relationships') {
                 $document->data = $document->makeRelationship($resource);
             }
 
@@ -98,12 +98,12 @@ class Document extends Abstracts\Document {
 
                 if ($type === 'resource') {
                     $_resource = $document->getResourceInstance($resource);
-                } elseif ($type === 'relationship') {
+                } elseif ($type === 'relationship' || $type === 'relationships') {
                     $_resource = $document->makeRelationship($resource);
                 }
 
                 // If data had this resource
-                $resourceKey = ($type === 'resource') ? $_resource->getType().'-'.$_resource->getId($resource) : $_resource->getData()->getType.'-'.$_resource->getData()->getId($_resource->getData()->getResourceObject());
+                $resourceKey = ($type === 'resource') ? $_resource->getType().'-'.$_resource->getId($resource) : $_resource->getData()->getType().'-'.$_resource->getData()->getId($_resource->getData()->getResourceObject());
                 if (in_array($resourceKey, $preventDuplicatedResources)) {
                     continue;
                 }
