@@ -155,6 +155,16 @@ abstract class Document implements \JsonSerializable {
     abstract public function setData($resource, $type = 'resource');
 
     /**
+    * Get document data
+    *
+    * @return array
+    */
+    public function getData()
+    {
+        return $this->data;
+    }
+    
+    /**
     * Set errors to document
     *
     * @param array|iterator|object Can be an instance or a collection of Element\Error, or simply an array of data
@@ -189,6 +199,16 @@ abstract class Document implements \JsonSerializable {
     * @return object this
     */
     abstract public function setIncluded($collection, $override = true);
+
+    /**
+    * Get document included data
+    *
+    * @return array
+    */
+    public function getIncluded()
+    {
+        return $this->included;
+    }
 
     /**
     * Add errors to document
