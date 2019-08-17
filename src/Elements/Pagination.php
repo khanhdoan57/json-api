@@ -24,12 +24,12 @@ class Pagination extends Links {
             throw new Exception('Pagination data must be an array');
         }
 
-        $requiredKeys = ['first', 'last'];
+        $validKeys = ['self', 'first', 'last', 'next', 'prev'];
 
-        foreach ($requiredKeys as $key) {
+        foreach ($links as $key => $value) {
             
-            if (!array_key_exists($key, $links)) {
-                throw new Exception('Pagination data must have "'.$key.'" member');
+            if (!in_array($key, $validKeys)) {
+                throw new Exception('Invalid pagination key ('.$key.'). Pagination key must be: first, last, prev, next');
             }
 
         }
