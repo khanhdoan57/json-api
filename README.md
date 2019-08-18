@@ -20,7 +20,7 @@ Then config your localhost nginx/apache to access [LOCALHOST_PATH]/examples/inde
 - [How to use?](#how-to-use)
     - [Create your resource schema](#create-your-resource-schema)
     - [Configuration and mapping your resources](#configuration-and-mapping-your-resources)
-    - [Document set and add methods](#document-set-and-add-methods)
+    - [Document methods](#document-methods)
     - [Implement relationships](#implement-relationships)
     - [Set data as relationships](#set-data-as-relationships)
     - [toArray() and toJson() methods](#toarray-and-tojson-methods)
