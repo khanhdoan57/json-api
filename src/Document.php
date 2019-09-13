@@ -73,13 +73,17 @@ class Document extends Abstracts\Document {
             throw new Exception('The members data and errors MUST NOT coexist in the same document.');
         }
 
+        // Set document type
+        $this->setDocumentType($type);
+        $type = $this->getDocumentType();
+
         $document = $this;
 
         $this->resourceHandler($resource, function($resource) use (&$document, $type) {
-
+            
             if ($type === 'resource') {
                 $document->data = $document->getResourceInstance($resource);
-            } elseif ($type === 'relationship' || $type === 'relationships') {
+            } elseif ($type === 'relationship') {
                 $document->data = $document->makeRelationship($resource);
             }
 
@@ -303,34 +307,34 @@ class Document extends Abstracts\Document {
         $document =& $this->document;
 
         // If document has resource or collection
-        if ($this->data) {
+        if ($this->getData()) {
             
-            $document['data'] = $this->data;
+            $document['data'] = $this->getData();
 
             // If has data, then it may has included
-            if ($this->included) {
-                $document['included'] = $this->included;
+            if ($this->getIncluded()) {
+                $document['included'] = $this->getIncluded();
             }
 
         }
 
         // If document has errors
-        if ($this->errors) {
-            $document['errors'] = $this->errors;
+        if ($this->getErrors()) {
+            $document['errors'] = $this->getErrors();
         }
 
         // If document has meta
-        if ($this->meta) {
-            $document['meta'] = $this->meta;
+        if ($this->getMeta()) {
+            $document['meta'] = $this->getMeta();
         }
 
         // If document has links
-        if ($this->links) {
-            $document['links'] = $this->links;
+        if ($this->getLinks()) {
+            $document['links'] = $this->getLinks();
         }
 
         // Add api info
-        if (@$this->config['show_api_version']) {
+        if ($this->getConfig('show_api_version')) {
             $document['jsonapi'] = [
                 'version' => self::VERSION
             ];

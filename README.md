@@ -122,18 +122,21 @@ Available "set" methods from $document object are:
 + setLinks($links) // Array of link data or HackerBoy\JsonApi\Elements\Links object
 + setMeta($meta) // Array of meta data or HackerBoy\JsonApi\Elements\Meta object
 
+Available "get" methods from $document object are: 
++ getConfig() // Get document config
++ getData() // Get document data
++ getIncluded() // Get document included data
++ getErrors() // Get document errors data
++ getMeta() // Get document meta data
++ getLinks() // Get document links
++ getUrl($path = '') // Get api url
++ getResourceInstance($modelObject) // Get resource instance of a model object
+
 Available "add" methods from $document object are:
 + addIncluded($resourceOrCollection)
 + addErrors($errors) // Array or HackerBoy\JsonApi\Elements\Error object - single error or multiple errors data will both work for this method
 + addLinks($links) // Array of link data or HackerBoy\JsonApi\Elements\Links object
 + addMeta($meta) // Array of meta data or HackerBoy\JsonApi\Elements\Meta object
-
-Available "get" methods from $document object are:
-+ getConfig() // Get document config
-+ getData() // Get document data
-+ getIncluded() // Get document included data
-+ getUrl($path = '') // Get api url
-+ getResourceInstance($modelObject) // Get resource instance of a model object
 
 Example:
 ```

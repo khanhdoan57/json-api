@@ -105,6 +105,14 @@ abstract class Document implements \JsonSerializable {
     protected $resourceMap;
 
     /**
+    * Document type
+    *
+    * @access protected
+    * @var string
+    */
+    protected $documentType;
+
+    /**
     * Get document config
     *
     * @param string Config key
@@ -163,7 +171,34 @@ abstract class Document implements \JsonSerializable {
     {
         return $this->data;
     }
-    
+
+    /**
+    * Set document type
+    *
+    * @param string
+    * @return object this
+    */
+    public function setDocumentType($type)
+    {
+        if (!in_array($type, ['resource', 'resources', 'relationship', 'relationships']) or $type === 'resources') {
+            $type = 'resource';
+        } elseif ($type === 'relationships') {
+            $type = 'relationships';
+        }
+
+        $this->documentType = $type;
+    }
+
+    /**
+    * Get document type
+    *
+    * @return string
+    */
+    public function getDocumentType()
+    {
+        return $this->documentType;
+    }
+
     /**
     * Set errors to document
     *
@@ -172,6 +207,16 @@ abstract class Document implements \JsonSerializable {
     * @return object this
     */
     abstract public function setErrors($errors, $override = true);
+
+    /**
+    * Get document errors
+    *
+    * @return array
+    */
+    public function getErrors()
+    {
+        return $this->errors;
+    }
 
     /**
     * Set meta to document
@@ -183,6 +228,16 @@ abstract class Document implements \JsonSerializable {
     abstract public function setMeta($meta, $override = true);
 
     /**
+    * Get document meta
+    *
+    * @return array
+    */
+    public function getMeta()
+    {
+        return $this->meta;
+    }
+
+    /**
     * Set links to document
     *
     * @param array|iterator|object
@@ -190,6 +245,16 @@ abstract class Document implements \JsonSerializable {
     * @return object this
     */
     abstract public function setLinks($links, $override = true);
+
+    /**
+    * Get document links
+    *
+    * @return array
+    */
+    public function getLinks()
+    {
+        return $this->links;
+    }
 
     /**
     * Set objects to included
@@ -207,6 +272,11 @@ abstract class Document implements \JsonSerializable {
     */
     public function getIncluded()
     {
+        // Included data only visible for document type = 'resource'
+        if ($this->getDocumentType() !== 'resource') {
+            return [];
+        }
+
         return $this->included;
     }
 

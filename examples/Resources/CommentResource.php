@@ -21,4 +21,10 @@ class CommentResource extends Resource {
         ];
     }
     
+    public function getRelationships($comment)
+    {
+        return [
+            'post' => $comment->post
+        ];
+    }
 }
