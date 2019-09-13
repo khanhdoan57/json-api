@@ -209,6 +209,10 @@ Second param allows you to set data as relationship (for request like: /api/post
 
 // Set data as relationship
 $document->setData($resourceOrCollection, 'relationship');
+
+// Or
+$document->setData($resourceOrCollection);
+$document->setDocumentType('relationship');
 ```
 
 ## toArray() and toJson() methods
@@ -228,9 +232,9 @@ Suppose that we created a $document object
 
 // Create an error
 $errorData = [
-    'id' => 123,
-    'status' => 500,
-    'code' => 456,
+    'id' => '123',
+    'status' => '500',
+    'code' => '456',
     'title' => 'Test error'
 ];
 

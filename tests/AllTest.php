@@ -26,11 +26,18 @@ class AllTest extends TestCase
     {
         global $config, $post1;
 
+        $meta = [
+            'test-key' => 'test-value',
+            'test2' => 'test value 2'
+        ];
+
         $document = new Document($config);
 
         $document->setData($post1);
+        $document->setMeta($meta);
 
         $this->assertTrue(Parser::isValidResponseString($document->toJson()));
+        $this->assertSame($meta, $document->toArray()['meta']);
     }
 
     public function testResourceCollectionDocument()
@@ -94,9 +101,10 @@ class AllTest extends TestCase
     {
         global $config;
 
+        // Error code and status will be converted to (string) automatically due to JSONAPI specs
         $error = [
-            'code' => "123",
-            'status' => "500",
+            'code' => 123,
+            'status' => 500,
             'title' => 'Test Error',
             'detail' => 'Test error detail'
         ];
@@ -113,14 +121,14 @@ class AllTest extends TestCase
 
         $errors = [
             [
-                'code' => "123",
-                'status' => "500",
+                'code' => 123,
+                'status' => 500,
                 'title' => 'Test Error',
                 'detail' => 'Test error detail'
             ],
             [
-                'code' => "321",
-                'status' => "400",
+                'code' => 321,
+                'status' => 400,
                 'title' => 'Test Error 2',
                 'detail' => 'Test error detail 2'
             ],

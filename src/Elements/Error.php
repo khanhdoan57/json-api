@@ -30,7 +30,7 @@ class Error extends Element {
 
             if (in_array($key, ['id', 'code', 'status', 'title', 'detail'])) {
                 
-                $this->data[$key] = $value;
+                $this->data[$key] = $key === 'id' ? $value : (string) $value;
 
             } elseif ($key === 'meta') {
 
