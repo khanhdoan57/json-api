@@ -95,8 +95,8 @@ class AllTest extends TestCase
         global $config;
 
         $error = [
-            'code' => 123,
-            'status' => 500,
+            'code' => "123",
+            'status' => "500",
             'title' => 'Test Error',
             'detail' => 'Test error detail'
         ];
@@ -113,14 +113,14 @@ class AllTest extends TestCase
 
         $errors = [
             [
-                'code' => 123,
-                'status' => 500,
+                'code' => "123",
+                'status' => "500",
                 'title' => 'Test Error',
                 'detail' => 'Test error detail'
             ],
             [
-                'code' => 321,
-                'status' => 400,
+                'code' => "321",
+                'status' => "400",
                 'title' => 'Test Error 2',
                 'detail' => 'Test error detail 2'
             ],
