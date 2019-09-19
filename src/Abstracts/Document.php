@@ -180,10 +180,10 @@ abstract class Document implements \JsonSerializable {
     */
     public function setDocumentType($type)
     {
-        if (!in_array($type, ['resource', 'resources', 'relationship', 'relationships']) or $type === 'resources') {
+        if (in_array($type, ['relationship', 'relationships'])) {
+            $type = 'relationship';
+        } else {
             $type = 'resource';
-        } elseif ($type === 'relationships') {
-            $type = 'relationships';
         }
 
         $this->documentType = $type;
@@ -196,7 +196,7 @@ abstract class Document implements \JsonSerializable {
     */
     public function getDocumentType()
     {
-        return $this->documentType;
+        return $this->documentType ?: 'resource';
     }
 
     /**
