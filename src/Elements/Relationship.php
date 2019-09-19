@@ -29,8 +29,8 @@ class Relationship extends Element {
     public function jsonSerialize()
     {
         return [
-            'id' => $this->data->getId($this->data->getResourceObject()),
-            'type' => $this->data->getType()
+            'id' => (string) $this->data->getId($this->data->getResourceObject()),
+            'type' => (string) $this->data->getType()
         ];
     }
 

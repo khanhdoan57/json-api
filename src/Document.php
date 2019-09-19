@@ -274,8 +274,8 @@ class Document extends Abstracts\Document {
                     }
 
                     // Same object - check by id and type
-                    if ($resource->getType() === $_resource->getType()
-                        and $resource->getId($resource->getResourceObject()) === $_resource->getId($_resource->getResourceObject())
+                    if ((string) $resource->getType() === (string) $_resource->getType()
+                        and (string) $resource->getId($resource->getResourceObject()) === (string) $_resource->getId($_resource->getResourceObject())
                     ) {
                         $found = true;
                         unset($this->included[$_key]);

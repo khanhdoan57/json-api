@@ -183,8 +183,8 @@ abstract class Resource implements \JsonSerializable {
         }
 
         $resource = [
-            'type' => $this->type,
-            'id' => $this->getId($this->resource),
+            'type' => (string) $this->type,
+            'id' => (string) $this->getId($this->resource),
             'attributes' => $attributes
         ];
 

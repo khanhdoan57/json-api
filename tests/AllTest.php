@@ -36,6 +36,7 @@ class AllTest extends TestCase
         $document->setData($post1);
         $document->setMeta($meta);
 
+        $this->assertTrue(is_string($document->toArray()['data']['id']));
         $this->assertTrue(Parser::isValidResponseString($document->toJson()));
         $this->assertSame($meta, $document->toArray()['meta']);
     }
@@ -80,7 +81,7 @@ class AllTest extends TestCase
         $this->assertTrue(Parser::isValidResponseString($singleRelationshipDocument->toJson()));
         $this->assertArrayHasKey('data', $singleRelationshipDocumentArray);
         $this->assertSame([
-            'id' => $comment1->id,
+            'id' => (string) $comment1->id,
             'type' => 'comments'
         ], $singleRelationshipDocumentArray['data']);
 
