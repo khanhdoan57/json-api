@@ -430,5 +430,5 @@ echo $peopleResource->getType(); // Expect 'people'
 var_dump($peopleResource->getAttributes()); // Expect ['name' => 'John Doe']
 
 // Modify resource data
-$peopleResource->setAttribute('email' => 'example@example.com');
+$peopleResource->setAttribute('email', 'example@example.com');
 ```
