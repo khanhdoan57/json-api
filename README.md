@@ -365,6 +365,8 @@ Parse from string
 ```
 <?php
 
+use HackerBoy\JsonApi\Helpers\Validator;
+
 $jsonapiString = '{
     "data": {
       "type": "articles",
@@ -419,10 +421,31 @@ $jsonapiString = '{
     ]
 }';
 
+// Helper method to validate request JSON:API string
+if (!Validator::isValidRequestString($jsonapiString)) {
+    throw new Exception('Invalid request string');
+}
+
+// Helper method to validate response JSON:API string
+if (!Validator::isValidResponseString($jsonapiString)) {
+    throw new Exception('Invalid response string');
+}
+
 $document = FlexibleDocument::parseFromString($jsonapiString);
+
+// Get primary data
+$article = $document->getData();
+
+// Get article's images and author
+$articleAuthor = $article->getRelationshipData('author');
+$articleImages = $article->getRelationshipData('images');
 
 // Find the people resource
 $peopleResource = $document->getQuery()->where(['type' => 'people', 'id' => '1'])->first();
+
+if ($articleAuthor === $peopleResource) {
+    echo 'Great! They are the same';
+}
 
 // Get data
 echo $peopleResource->getId(); // Expect '1'
@@ -431,4 +454,7 @@ var_dump($peopleResource->getAttributes()); // Expect ['name' => 'John Doe']
 
 // Modify resource data
 $peopleResource->setAttribute('email', 'example@example.com');
+
+// Check document after modification
+echo $document->toJson();
 ```
