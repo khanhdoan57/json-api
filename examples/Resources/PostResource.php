@@ -8,23 +8,23 @@ class PostResource extends Resource {
 
     protected $type = 'posts';
 
-    public function getId($post)
+    public function getId()
     {
-        return $post->id;
+        return $this->model->id;
     } 
 
-    public function getAttributes($post)
+    public function getAttributes()
     {
         return [
-            'title' => $post->title,
-            'content' => $post->content
+            'title' => $this->model->title,
+            'content' => $this->model->content
         ];
     }
 
-    public function getRelationships($post)
+    public function getRelationships()
     {
         return [
-            'comments' => $post->comments,
+            'comments' => $this->model->comments,
             /** or
             'comments' => [
                 'meta' => [
@@ -33,16 +33,16 @@ class PostResource extends Resource {
                 'links' => [
                     'self' => '/path'
                 ],
-                'data' => $post->comments
+                'data' => $this->model->comments
             ]
             */
         ];
     }
 
-    public function getMeta($post)
+    public function getMeta()
     {
         return [
-            'post-meta-test' => 'This is title: '.$post->title
+            'post-meta-test' => 'This is title: '.$this->model->title
         ];
     }
 }

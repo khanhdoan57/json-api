@@ -10,10 +10,12 @@
 namespace HackerBoy\JsonApi\Abstracts;
 
 use HackerBoy\JsonApi\Elements\Relationships;
+use HackerBoy\JsonApi\Elements\Relationship;
 use HackerBoy\JsonApi\Elements\Meta;
 use HackerBoy\JsonApi\Traits\AbstractDataConvert;
+use Illuminate\Support\Str;
 
-abstract class Resource implements \JsonSerializable {
+abstract class Resource implements \JsonSerializable, \ArrayAccess {
     
     use AbstractDataConvert;
 
@@ -22,9 +24,9 @@ abstract class Resource implements \JsonSerializable {
     *
     * @param object
     */
-    public function __construct($resource, Document $document)
+    public function __construct($model, Document $document)
     {
-        $this->resource = $resource;
+        $this->model = $model;
         $this->document = $document;
     }
 
@@ -34,7 +36,7 @@ abstract class Resource implements \JsonSerializable {
     * @var object
     * @access protected
     */
-    protected $resource;
+    protected $model;
 
     /**
     * Document object
@@ -52,12 +54,23 @@ abstract class Resource implements \JsonSerializable {
     protected $type;
 
     /**
+    * Get document
+    *
+    * @param void
+    * @return \HackerBoy\JsonApi\Document
+    */
+    public function getDocument()
+    {
+        return $this->document;
+    }
+
+    /**
     * Get resource ID
     *
-    * @param object Resource object
+    * @param void
     * @return string|integer Resource ID
     */
-    abstract public function getId($resource);
+    abstract public function getId();
 
     /**
     * Get resource type
@@ -70,26 +83,26 @@ abstract class Resource implements \JsonSerializable {
     /**
     * Get resource model object
     */
-    final public function getResourceObject()
+    final public function getModelObject()
     {
-        return $this->resource;
+        return $this->model;
     }
 
     /**
     * Map resource attributes
     *
-    * @param object Resource object
+    * @param void
     * @return array
     */
-    abstract public function getAttributes($resource);
+    abstract public function getAttributes();
 
     /**
     * Define resource relationships
     *
-    * @param object
+    * @param void
     * @return array
     */
-    public function getRelationships($resource)
+    public function getRelationships()
     {
         return [];
     }
@@ -97,29 +110,79 @@ abstract class Resource implements \JsonSerializable {
     /**
     * Define resource links
     *
-    * @param object
+    * @param void
     * @return array
     */
-    public function getLinks($resource)
+    public function getLinks()
     {
-        if (!$this->document->getConfig('auto_set_links')) {
+        if (!$this->getDocument()->getConfig('auto_set_links')) {
             return [];
         }
 
         return [
-            'self' => $this->document->getUrl($this->getType().'/'.$this->getId($resource))
+            'self' => $this->getDocument()->getUrl($this->getType().'/'.$this->getId())
         ];
     }
 
     /**
     * Define resource meta data
     *
-    * @param array
+    * @param void
     * @return this
     */
-    public function getMeta($resource)
+    public function getMeta()
     {
         return [];        
+    }
+
+    /**
+    * Get relationship data using $document->getQuery()
+    *
+    * @param string Relationship name
+    * @return mixed Resource or a collection of Resources
+    */
+    public function getRelationshipData($relationshipName)
+    {
+        $relationships = $this->getAbstractRelationships();
+
+        if (!$relationships) {
+            return null;
+        }
+
+        $relationships = $relationships->getData();
+
+        if (!isset($relationships[$relationshipName])) {
+            return null;
+        }
+
+        $relationshipData = $relationships[$relationshipName]['data'];
+
+        if ($relationshipData instanceof Relationship) {
+
+            return $this->getDocument()
+                        ->getQuery()
+                        ->where('type', $relationshipData->getData()->getType())
+                        ->where('id', $relationshipData->getData()->getId())
+                        ->first();
+
+        } elseif (is_iterable($relationshipData)) {
+
+            $type = '';
+            $ids = [];
+
+            foreach ($relationshipData as $relationship) {
+                $type = $relationship->getData()->getType();
+                $ids[] = $relationship->getData()->getId();
+            }
+
+            return $this->getDocument()
+                        ->getQuery()
+                        ->where('type', $type)
+                        ->whereIn('id', $ids);
+
+        }
+
+        return null;
     }
 
     /**
@@ -130,13 +193,13 @@ abstract class Resource implements \JsonSerializable {
     */
     final protected function getAbstractMeta()
     {
-        $meta = $this->getMeta($this->resource);
+        $meta = $this->getMeta();
 
         if (!$meta) {
             return null;
         }
 
-        return ($meta instanceof Meta) ? $meta : $this->document->makeMeta($meta);
+        return ($meta instanceof Meta) ? $meta : $this->getDocument()->makeMeta($meta);
     }
 
     /**
@@ -148,18 +211,18 @@ abstract class Resource implements \JsonSerializable {
     */
     final protected function getAbstractRelationships()
     {
-        if ($relationships = $this->getRelationships($this->resource)) {
+        if ($relationships = $this->getRelationships()) {
 
             if (array_key_exists('id', $relationships) or array_key_exists('type', $relationships)) {
                 throw new \Exception('JSON-API resources cannot have an attribute or relationship named type or id. Check https://jsonapi.org/format/#document-resource-object-fields');
             }
 
-            if ($relationships instanceof Relationships) {
+            if (is_object($relationships) and $relationships instanceof Relationships) {
                 return $relationships;
             } 
 
             if (is_array($relationships) and count($relationships)) {
-                return new Relationships($relationships, $this->document, $this);
+                return new Relationships($relationships, $this->getDocument(), $this);
             }
             
         }
@@ -176,7 +239,7 @@ abstract class Resource implements \JsonSerializable {
     */
     final public function jsonSerialize()
     {
-        $attributes = $this->getAttributes($this->resource);
+        $attributes = $this->getAttributes();
 
         if (array_key_exists('id', $attributes) or array_key_exists('type', $attributes)) {
             throw new \Exception('JSON-API resources cannot have an attribute or relationship named type or id. Check https://jsonapi.org/format/#document-resource-object-fields');
@@ -184,7 +247,7 @@ abstract class Resource implements \JsonSerializable {
 
         $resource = [
             'type' => (string) $this->type,
-            'id' => (string) $this->getId($this->resource),
+            'id' => (string) $this->getId(),
             'attributes' => $attributes
         ];
 
@@ -192,7 +255,7 @@ abstract class Resource implements \JsonSerializable {
             $resource['relationships'] = $relationships;
         }
 
-        if ($links = $this->getLinks($this->resource)) {
+        if ($links = $this->getLinks()) {
             $resource['links'] = $links;
         }
 
@@ -203,4 +266,51 @@ abstract class Resource implements \JsonSerializable {
         return $resource;
     }
 
+    /**
+    * {@inheritdoc}
+    */
+    public function offsetExists($offset)
+    {
+        return in_array($offset, ['id', 'type', 'attributes', 'meta', 'links', 'relationships']);
+    }
+
+    /**
+    * {@inheritdoc}
+    */
+    public function offsetGet($offset)
+    {
+        if (!$this->offsetExists($offset)) {
+            return null;
+        }
+
+        if (method_exists($this, 'get'.Str::camel($offset))) {
+            return $this->{'get'.Str::camel($offset)}();
+        }
+
+        return null;
+    }
+
+    /**
+    * {@inheritdoc}
+    */
+    public function offsetUnset($offset)
+    {
+        return;
+    }
+
+    /**
+    * {@inheritdoc}
+    */
+    public function offsetSet($offset, $value)
+    {
+        if (!$this->offsetExists($offset)) {
+            return;
+        }
+
+        if (in_array($offset, ['id', 'type', 'attributes', 'meta', 'links', 'relationships']) and method_exists($this, 'set'.Str::camel($offset))) {
+            $this->{'set'.Str::camel($offset)}($value);
+        }
+
+        return;
+    }
 }

@@ -16,42 +16,6 @@ use HackerBoy\JsonApi\Elements as Element;
 class Document extends Abstracts\Document {
 
     /**
-    * Document object constructor
-    *
-    * @param array A map of Model => Resource classes
-    * @param object|array A model object or a collection
-    */
-    public function __construct($config)
-    {
-        if (!is_array($config)) {
-            throw new Exception('Config must be an array');
-        }
-
-        if (!array_key_exists('resource_map', $config)) {
-            throw new Exception('Missing resource_map in config');
-        }
-
-        $resourceMap = $config['resource_map'];
-
-        // Check resource map
-        if (!is_array($resourceMap) or !count($resourceMap)) {
-            throw new Exception('Resource Map must be an array containing at least 1 element');
-        }
-
-        // Save resource map
-        $this->resourceMap = $resourceMap;
-
-        if ($apiUrl = @$config['api_url']) {
-
-            $apiUrl = rtrim($apiUrl, '/');
-
-            $this->url = $apiUrl;
-        }
-
-        $this->config = $config;
-    }
-
-    /**
     * Doument data
     *
     * @access protected
@@ -82,10 +46,13 @@ class Document extends Abstracts\Document {
         $this->resourceHandler($resource, function($resource) use (&$document, $type) {
             
             if ($type === 'resource') {
-                $document->data = $document->getResourceInstance($resource);
+                $document->data = $document->getResource($resource);
             } elseif ($type === 'relationship') {
                 $document->data = $document->makeRelationship($resource);
             }
+
+            // Mapping for query
+            $this->getQuery()->mapResource($document->getResource($resource));
 
         }, function($collection) use (&$document, $type) {
 
@@ -96,13 +63,16 @@ class Document extends Abstracts\Document {
             foreach ($collection as $resource) {
 
                 if ($type === 'resource') {
-                    $_resource = $document->getResourceInstance($resource);
+                    $_resource = $document->getResource($resource);
                 } elseif ($type === 'relationship' || $type === 'relationships') {
                     $_resource = $document->makeRelationship($resource);
                 }
 
+                // Mapping for query
+                $this->getQuery()->mapResource($document->getResource($resource));
+
                 // If data had this resource
-                $resourceKey = ($type === 'resource') ? $_resource->getType().'-'.$_resource->getId($resource) : $_resource->getData()->getType().'-'.$_resource->getData()->getId($_resource->getData()->getResourceObject());
+                $resourceKey = ($type === 'resource') ? $_resource->getType().'-'.$_resource->getId() : $_resource->getData()->getType().'-'.$_resource->getData()->getId();
                 if (in_array($resourceKey, $preventDuplicatedResources)) {
                     continue;
                 }
@@ -239,12 +209,22 @@ class Document extends Abstracts\Document {
         $abstractCollection = [];
         if ($this->checkResource($collection) === self::IS_RESOURCE) {
 
-            $abstractCollection[] = $this->getResourceInstance($collection);
+            $resource = $this->getResource($collection);
+            $abstractCollection[] = $resource;
+
+            // Mapping for query
+            $this->getQuery()->mapResource($resource);
 
         } elseif (is_iterable($collection) and in_array($this->checkResource($collection, true), [self::IS_COLLECTION, self::IS_FLEXIBLE_RESOURCE_COLLECTION])) {
             
             foreach ($collection as $resource) {
-                $abstractCollection[] = $this->getResourceInstance($resource);
+
+                $resource = $this->getResource($resource);
+                $abstractCollection[] = $resource;
+
+                // Mapping for query
+                $this->getQuery()->mapResource($resource);
+
             }
 
         } else {
@@ -275,7 +255,7 @@ class Document extends Abstracts\Document {
 
                     // Same object - check by id and type
                     if ((string) $resource->getType() === (string) $_resource->getType()
-                        and (string) $resource->getId($resource->getResourceObject()) === (string) $_resource->getId($_resource->getResourceObject())
+                        and (string) $resource->getId() === (string) $_resource->getId()
                     ) {
                         $found = true;
                         unset($this->included[$_key]);

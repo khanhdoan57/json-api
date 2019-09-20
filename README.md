@@ -17,7 +17,7 @@ composer install --dev;
 Then config your localhost nginx/apache to access [LOCALHOST_PATH]/examples/index.php
 
 # Table of Contents
-- [How to use?](#how-to-use)
+- [How to use? (Making response document)](#how-to-use)
     - [Create your resource schema](#create-your-resource-schema)
     - [Configuration and mapping your resources](#configuration-and-mapping-your-resources)
     - [Document methods](#document-methods)
@@ -28,12 +28,17 @@ Then config your localhost nginx/apache to access [LOCALHOST_PATH]/examples/inde
         - [Create errors](#create-errors)
         - [Create links](#create-links)
         - [Create other elements](#create-other-elements)
-    - [Flexible document and resources](#flexible-document-and-resources)
-        - [Example of flexible document use](#example-of-flexible-document-use)
+    - [Document query](#document-query)
+        - [Examples of document query](#examples-of-document-query)
 
+- [Client-Side usages](#client-side-usages)
+    - [Flexible document and resources](#flexible-document-and-resources)
+        - [Example of flexible document](#example-of-flexible-document)
+        - [Parse from string or array](#parse-from-string-or-array)
 
 # How to use?
 ## Create your resource schema
+Mapping your id, type, attributes from your model objects by creating Schema classes. Inside the Schema class, you can retrieve your model object through `$this->model`.
 For example, I'm gonna talk in a Laravel project context. Firstly, let's create a resource file: /app/Http/JsonApiResources/UserResource.php
 
 ```
@@ -45,26 +50,27 @@ class UserResource extends Resource {
 
     protected $type = 'users';
 
-    public function getId($user)
+    public function getId()
     {
-        return $user->id;
+        // $this->model is the instance of model, in this case, it's App\User
+        return $this->model->id;
     } 
 
-    public function getAttributes($user)
+    public function getAttributes()
     {
         return [
-            'name' => $user->name,
-            'email' => $user->email
+            'name' => $this->model->name,
+            'email' => $this->model->email
         ];
     }
 
     /**
     * Meta is optional
     */
-    public function getMeta($user)
+    public function getMeta()
     {
         return [
-            'meta-is-optional' => $user->some_value
+            'meta-is-optional' => $this->model->some_value
         ];
     }
 }
@@ -124,6 +130,7 @@ Available "set" methods from $document object are:
 + setMeta($meta) // Array of meta data or HackerBoy\JsonApi\Elements\Meta object
 
 Available "get" methods from $document object are: 
++ getQuery() // Get [Query](#document-query) object for finding resources
 + getConfig() // Get document config
 + getData() // Get document data
 + getIncluded() // Get document included data
@@ -174,27 +181,27 @@ class PostResource extends Resource {
 
     protected $type = 'posts';
 
-    public function getId($post)
+    public function getId()
     {
-        return $post->id;
+        return $this->model->id;
     } 
 
-    public function getAttributes($post)
+    public function getAttributes()
     {
         return [
-            'title' => $post->title,
-            'content' => $post->content
+            'title' => $this->model->title,
+            'content' => $this->model->content
         ];
     }
 
-    public function getRelationships($post)
+    public function getRelationships()
     {
         $relationships = [
-            'author' => $post->author, // Post has relationship with author
+            'author' => $this->model->author, // Post has relationship with author
 
             // If post has comments, return a collection
             // Not? Return a blank array (implement empty to-many relationship)
-            'comments' => $post->comments ? $post->comments : []
+            'comments' => $this->model->comments ? $this->model->comments : []
         ];
 
         return $relationships;
@@ -296,13 +303,32 @@ It'll work the same way, available methods are:
 
 You can see more examples in /examples/index.php
 
+## Document Query
+
+New feature in v2, now you can make query to find resources (HackerBoy\JsonApi\Abstracts\Resource) in a document by using `$document->getQuery()` method. 
+`$document->getQuery()` return an instance of Laravel [Illuminate\Support\Collection](https://laravel.com/docs/collections) (Check the link for full document of querying methods).
+
+Objects returned by query are `\HackerBoy\JsonApi\Abstracts\Resource`
+
+### Example of document query
+
+```
+<?php
+
+$findResourceById = $document->getQuery()->where('type', '...')->where('id', '...')->first();
+$findResourceByAttributes = $document->getQuery()->where('attributes.title', '...')->first();
+
+```
+
+# Client-Side usages
+
 ## Flexible document and resources
 - Flexible document can be used exactly like normal document, but $config is optional, flexible resource allowed... You can consider it as a "free schema" version of document.
-- Flexible document can use $config as normal document, then you can use it to work with flexible resource and mapped resource in the same document.
+- Flexible document can use the same $config as normal document, then you can use it to work with flexible resource and mapped resource in the same document.
 - Flexible document might be helpful for projects with no ORM, build JSON API data quickly without configuration, build JSON API data to POST to another JSON API endpoint...
 - Flexible document is not recommended anyway, as it allows to build a document in a free way and may cause unpredicted errors to your API like missing elements, invalid format...etc... So use it carefully and wisely
 
-### Example of flexible document use
+### Example of flexible document
 
 ```
 <?php
@@ -328,4 +354,79 @@ $flexibleDocument->setData($flexibleResource); // You can put in a collection as
 
 echo $flexibleDocument->toJson();
 
+```
+
+### Parse from string or array
+
+Parse from string
+
+```
+<?php
+
+$jsonapiString = '{
+    "data": {
+      "type": "articles",
+      "id": "1",
+      "attributes": {
+        "title": "Rails is Omakase"
+      },
+      "relationships": {
+        "author": {
+          "links": {
+            "self": "/articles/1/relationships/author",
+            "related": "/articles/1/author"
+          },
+          "data": { "type": "people", "id": "9" }
+        },
+        "images": {
+            "data": [
+                {
+                    "type": "images",
+                    "id": "1"
+                },
+                {
+                    "type": "images",
+                    "id": "2"
+                }
+            ]
+        }
+      }
+    },
+    "included": [
+        {
+            "type": "people",
+            "id": "1",
+            "attributes": {
+                "name": "John Doe"
+            }
+        },
+        {
+            "type": "images",
+            "id": "1",
+            "attributes": {
+                "src": "http://example.com/1.jpg"
+            }
+        },
+        {
+            "type": "images",
+            "id": "2",
+            "attributes": {
+                "src": "http://example.com/2.jpg"
+            }
+        }
+    ]
+}';
+
+$document = FlexibleDocument::parseFromString($jsonapiString);
+
+// Find the people resource
+$peopleResource = $document->getQuery()->where(['type' => 'people', 'id' => '1'])->first();
+
+// Get data
+echo $peopleResource->getId(); // Expect '1'
+echo $peopleResource->getType(); // Expect 'people'
+var_dump($peopleResource->getAttributes()); // Expect ['name' => 'John Doe']
+
+// Modify resource data
+$peopleResource->setAttribute('email' => 'example@example.com');
 ```

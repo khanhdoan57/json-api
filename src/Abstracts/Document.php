@@ -9,9 +9,10 @@
 
 namespace HackerBoy\JsonApi\Abstracts;
 
+use HackerBoy\JsonApi\Traits\AbstractDataConvert;
+use HackerBoy\JsonApi\Query;
 use Closure;
 use Exception;
-use HackerBoy\JsonApi\Traits\AbstractDataConvert;
 
 abstract class Document implements \JsonSerializable {
 
@@ -47,6 +48,14 @@ abstract class Document implements \JsonSerializable {
     * @var array
     */
     protected $config;
+
+    /**
+    * Query object
+    *
+    * @access protected
+    * @var \HackerBoy\JsonApi\Query
+    */
+    protected $query;
 
     /**
     * Data to encode
@@ -113,6 +122,55 @@ abstract class Document implements \JsonSerializable {
     protected $documentType;
 
     /**
+    * Resource instances
+    *
+    * @access protected
+    * @var array
+    */
+    protected $resourceInstances = [];
+
+    /**
+    * Document constructor
+    *
+    * @param array Config
+    */
+    public function __construct($config)
+    {
+        if (!is_array($config) and !$this->isFlexible) {
+            throw new Exception('Config must be an array');
+        }
+
+        if (!array_key_exists('resource_map', $config) and !$this->isFlexible) {
+            throw new Exception('Missing resource_map in config');
+        }
+
+        $resourceMap = $config['resource_map'];
+
+        // Check resource map
+        if ((!is_array($resourceMap) or !count($resourceMap)) and !$this->isFlexible) {
+            throw new Exception('Resource Map must be an array containing at least 1 element');
+        } else {
+
+            // Save resource map
+            $this->resourceMap = $resourceMap;
+
+            if ($apiUrl = @$config['api_url']) {
+
+                $apiUrl = rtrim($apiUrl, '/');
+
+                $this->url = $apiUrl;
+            }
+
+        }
+
+        // Save config
+        $this->config = $config;
+
+        // Make a new query object
+        $this->query = new Query();
+    }
+
+    /**
     * Get document config
     *
     * @param string Config key
@@ -140,6 +198,17 @@ abstract class Document implements \JsonSerializable {
     final public function getUrl($path = '')
     {
         return $this->url.'/'.$path;
+    }
+
+    /**
+    * Get query object
+    *
+    * @param void
+    * @return \HackerBoy\JsonApi\Query
+    */
+    public function getQuery()
+    {
+        return $this->query;
     }
 
     /**
@@ -459,19 +528,33 @@ abstract class Document implements \JsonSerializable {
     * @param object Model object
     * @return object Resource
     */
-    final public function getResourceInstance($resource)
+    final public function getResource($model)
     {
-        $checkResource = $this->checkResource($resource);
+        // If flexible document
+        if ($this->isFlexible and !in_array($this->checkResource($model), [self::IS_FLEXIBLE_RESOURCE, self::IS_RESOURCE])) {
+            $model = $this->newResourceFromArray((array) $model);
+        }
+
+        $hash = spl_object_hash($model);
+
+        if (isset($this->resourceInstances[$hash])) {
+            return $this->resourceInstances[$hash];
+        }
+
+        $checkResource = $this->checkResource($model);
 
         if ($checkResource === self::IS_FLEXIBLE_RESOURCE) {
-            return $resource;
+            return $model;
         }
 
         if ($checkResource !== self::IS_RESOURCE) {
             throw new Exception('Invalid model object - cannot get resource instance');
         }
 
-        return new $this->resourceMap[get_class($resource)]($resource, $this);
+        // Make new resource instance
+        $resourceInstance = new $this->resourceMap[get_class($model)]($model, $this);
+
+        return $this->resourceInstances[$hash] = $resourceInstance;
     }
 
     /**

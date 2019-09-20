@@ -10,10 +10,11 @@
         }
     ],
     "require": {
-        "php": ">=7.1.0"
+        "php": ">=7.1.0",
+        "art4/json-api-client": "^0.10.0",
+        "illuminate/support": "^6.0"
     },
     "require-dev": {
-        "art4/json-api-client": "^0.10.0",
         "phpunit/phpunit": "^8.3"
     },
     "autoload": {

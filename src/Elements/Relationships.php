@@ -107,8 +107,8 @@ class Relationships extends Element {
                 and $parentResource instanceof Resource
             ) {
                 $this->data[$relationshipKey]['links'] = [
-                    'related' => $document->getUrl($parentResource->getType().'/'.$parentResource->getId($parentResource->getResourceObject()).'/'.$relationshipKey),
-                    'self' => $document->getUrl($parentResource->getType().'/'.$parentResource->getId($parentResource->getResourceObject()).'/relationships/'.$relationshipKey)
+                    'related' => $document->getUrl($parentResource->getType().'/'.$parentResource->getId().'/'.$relationshipKey),
+                    'self' => $document->getUrl($parentResource->getType().'/'.$parentResource->getId().'/relationships/'.$relationshipKey)
                 ];
             }
         }

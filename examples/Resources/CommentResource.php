@@ -8,23 +8,23 @@ class CommentResource extends Resource {
 
     protected $type = 'comments';
 
-    public function getId($comment)
+    public function getId()
     {
-        return $comment->id;
+        return $this->model->id;
     } 
 
-    public function getAttributes($comment)
+    public function getAttributes()
     {
         return [
-            'post_id' => $comment->post_id,
-            'content' => $comment->content
+            'post_id' => $this->model->post_id,
+            'content' => $this->model->content
         ];
     }
     
-    public function getRelationships($comment)
+    public function getRelationships()
     {
         return [
-            'post' => $comment->post
+            'post' => $this->model->post
         ];
     }
 }

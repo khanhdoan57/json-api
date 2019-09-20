@@ -20,7 +20,7 @@ class Relationship extends Element {
     */
     public function __construct($resource, Document $document)
     {
-        $this->data = $document->getResourceInstance($resource);
+        $this->data = $document->getResource($resource);
     }
 
     /**
@@ -29,7 +29,7 @@ class Relationship extends Element {
     public function jsonSerialize()
     {
         return [
-            'id' => (string) $this->data->getId($this->data->getResourceObject()),
+            'id' => (string) $this->data->getId(),
             'type' => (string) $this->data->getType()
         ];
     }

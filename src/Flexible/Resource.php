@@ -30,29 +30,29 @@ class Resource extends Abstracts\Resource {
     public function __construct(Abstracts\Document $document)
     {
         $this->document = $document;
-        $this->resource = $this;
+        $this->model = $this;
     }
 
     /**
     * Get resource ID
     *
-    * @param object Resource object
+    * @param void
     * @return string|integer Resource ID
     */
-    public function getId($resource)
+    public function getId()
     {
-        return $resource->id;
+        return $this->id;
     }
 
     /**
     * Map resource attributes
     *
-    * @param object Resource object
+    * @param void
     * @return array
     */
-    public function getAttributes($resource)
+    public function getAttributes()
     {
-        return $resource->attributes ? $resource->attributes : [];
+        return $this->attributes ?: [];
     }
 
     /**
@@ -61,31 +61,31 @@ class Resource extends Abstracts\Resource {
     * @param object
     * @return array
     */
-    public function getRelationships($resource)
+    public function getRelationships()
     {
-        return $resource->relationships ? $resource->relationships : [];
+        return $this->relationships ?: [];
     }
 
     /**
     * Define resource links
     *
-    * @param object
+    * @param void
     * @return array
     */
-    public function getLinks($resource)
+    public function getLinks()
     {
-        return $resource->links ? $resource->links : [];
+        return $this->links ?: [];
     }
 
     /**
     * Define resource meta data
     *
-    * @param array
+    * @param void
     * @return this
     */
-    public function getMeta($resource)
+    public function getMeta()
     {
-        return $resource->meta ? $resource->meta : [];
+        return $this->meta ?: [];
     }
 
     /**
@@ -133,6 +133,19 @@ class Resource extends Abstracts\Resource {
     }
 
     /**
+    * Set an attribute
+    *
+    * @param string Attribute name
+    * @param mixed Attribute value
+    * @return this
+    */
+    public function setAttribute($key, $value)
+    {
+        $this->attributes[$key] = $value;
+        return $this;
+    }
+
+    /**
     * Set relationships
     *
     * @param array|object
@@ -140,8 +153,58 @@ class Resource extends Abstracts\Resource {
     */
     public function setRelationships($relationships)
     {
-        $this->relationships = ($relationships instanceof Element\Relationships) ? $relationships : $this->document->makeRelationships($relationships);
+        $this->relationships = ($relationships instanceof Element\Relationships) ? $relationships : (function() use ($relationships) {
+
+            foreach ($relationships as $relationshipName => $relationshipData) {
+                    
+                // Formatting
+                if (!is_array($relationshipData) or !isset($relationshipData['data'])) {
+                    $_relationshipData = $relationshipData;
+                    $relationshipData = [];
+                    $relationshipData['data'] = $_relationshipData;
+                    unset($_relationshipData);
+                }
+
+                // Skip if data is a valid resource or collection
+                if(!in_array($this->document->checkResource($relationshipData['data']), [Document::INVALID_RESOURCE, Document::INVALID_COLLECTION])) {
+                    continue;
+                }
+
+                // Data is raw array, make flexible resources then
+                // To One relationship
+                if (isset($relationshipData['data']['id'])) {
+
+                    $resource = $this->document->makeFlexibleResource();
+                    $resource->setType($relationshipData['data']['type']);
+                    $resource->setId($relationshipData['data']['id']);
+                    
+                    $relationshipData['data'] = $resource;
+
+                } else {
+
+                    // To Many relationship
+                    foreach ($relationshipData['data'] as $key => $relationship) {
+                        
+                        $resource = $this->document->makeFlexibleResource();
+                        $resource->setType($relationship['type']);
+                        $resource->setId($relationship['id']);
+
+                        $relationshipData['data'][$key] = $resource;
+
+                    }
+
+                }
+
+                $relationships[$relationshipName] = $relationshipData;
+
+            }
+
+            return $this->document->makeRelationships($relationships);
+
+        })();
+
         return $this;
+
     }
 
     /**
