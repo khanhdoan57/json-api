@@ -1,3 +1,5 @@
+# Current version: 2.x
+
 # Packagist: hackerboy/json-api
 Making JSON API implementation (server side) easiest for you 
 ## Install
