@@ -450,6 +450,8 @@ if ($articleAuthor === $peopleResource) {
 // Get data
 echo $peopleResource->getId(); // Expect '1'
 echo $peopleResource->getType(); // Expect 'people'
+echo $peopleResource->getAttribute('name'); // Expect 'John Doe'
+echo $peopleResource->getAttribute('not-found-attribute', 'Default value'); // Expect 'Default value'
 var_dump($peopleResource->getAttributes()); // Expect ['name' => 'John Doe']
 
 // Modify resource data

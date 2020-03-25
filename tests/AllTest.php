@@ -264,9 +264,14 @@ class AllTest extends TestCase
         $this->assertSame($article->getRelationshipData('author'), $document->getQuery()->where(['id' => '1', 'type' => 'people'])->first());
 
         // Test set new attribute
-        $article->setAttribute('test-new-attribute', 'Test value');
+        $newAttribute =  'Test value - '.microtime(true);
+        $article->setAttribute('test-new-attribute', $newAttribute);
 
-        $this->assertTrue($document->toArray()['data']['attributes']['test-new-attribute'] === 'Test value');
+        // Test get attribute
+        $this->assertEquals($newAttribute, $article->getAttribute('test-new-attribute'));
+        $this->assertEquals($article->getAttribute('not-found-attribute', 'default value'), 'default value');
+
+        $this->assertTrue($document->toArray()['data']['attributes']['test-new-attribute'] === $newAttribute);
 
     }
 

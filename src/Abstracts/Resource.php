@@ -81,6 +81,18 @@ abstract class Resource implements \JsonSerializable, \ArrayAccess {
     }
 
     /**
+    * Get attribute value
+    *
+    * @param string Attribute name
+    * @param mixed Default value - Default null
+    */
+    final public function getAttribute($name, $default = null)
+    {
+        $attributes = $this->getAttributes();
+        return array_key_exists($name, $attributes) ? $attributes[$name] : $default;
+    }
+
+    /**
     * Get resource model object
     */
     final public function getModelObject()
