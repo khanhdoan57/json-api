@@ -259,8 +259,11 @@ abstract class Resource implements \JsonSerializable, \ArrayAccess {
 
         $resource = [
             'type' => (string) $this->type,
-            'attributes' => $attributes
         ];
+
+        if ($attributes and count($attributes)) {
+            $resource['attributes'] = $attributes;
+        }
 
         if ($id = (string) $this->getId()) {
             $resource['id'] = $id;
