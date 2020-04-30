@@ -10,10 +10,12 @@
 namespace HackerBoy\JsonApi\Abstracts;
 
 use HackerBoy\JsonApi\Traits\AbstractDataConvert;
+use HackerBoy\JsonApi\Traits\ElementIterator;
+use HackerBoy\JsonApi\Traits\ElementCountable;
 
-abstract class Element implements \JsonSerializable {
+abstract class Element implements \JsonSerializable, \Iterator, \Countable {
 
-    use AbstractDataConvert;
+    use AbstractDataConvert, ElementIterator, ElementCountable;
 
     /**
     * Constructor

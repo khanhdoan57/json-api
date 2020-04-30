@@ -211,7 +211,7 @@ class AllTest extends TestCase
                     "self": "/articles/1/relationships/author",
                     "related": "/articles/1/author"
                   },
-                  "data": { "type": "people", "id": "9" }
+                  "data": { "type": "people", "id": "1" }
                 },
                 "images": {
                     "data": [
@@ -225,6 +225,10 @@ class AllTest extends TestCase
                         }
                     ]
                 }
+              },
+              "meta": {
+                "a": "b",
+                "c": "d"
               }
             },
             "included": [
@@ -261,7 +265,9 @@ class AllTest extends TestCase
 
         $article = $document->getData();
 
-        $this->assertSame($article->getRelationshipData('author'), $document->getQuery()->where(['id' => '1', 'type' => 'people'])->first());
+        $this->assertSame($article->getRelationshipData('author'), $document->getQuery()->where('id', '1')->where('type', 'people')->first());
+        $this->assertTrue(is_iterable($article->getRelationships()));
+        $this->assertEquals(2, count($article->getMeta()));
 
         // Test set new attribute
         $newAttribute =  'Test value - '.microtime(true);
