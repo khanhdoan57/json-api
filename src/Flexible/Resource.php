@@ -158,7 +158,7 @@ class Resource extends Abstracts\Resource {
             foreach ($relationships as $relationshipName => $relationshipData) {
                     
                 // Formatting
-                if (!is_array($relationshipData) or !isset($relationshipData['data'])) {
+                if (!is_array($relationshipData) or !array_key_exists('data', $relationshipData)) {
                     $_relationshipData = $relationshipData;
                     $relationshipData = [];
                     $relationshipData['data'] = $_relationshipData;
@@ -180,7 +180,7 @@ class Resource extends Abstracts\Resource {
                     
                     $relationshipData['data'] = $resource;
 
-                } else {
+                } elseif ($relationship['data']) {
 
                     // To Many relationship
                     foreach ($relationshipData['data'] as $key => $relationship) {
