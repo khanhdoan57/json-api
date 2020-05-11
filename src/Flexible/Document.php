@@ -129,7 +129,7 @@ class Document extends BaseDocument {
             $resource->setId($resourceId);
         }
 
-        return;
+        return $resource;
     }
 
     /**
