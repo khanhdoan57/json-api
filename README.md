@@ -351,6 +351,9 @@ $flexibleResource->setId(1234);
                         'self' => '/link'
                     ]);
 
+// Or with faster way to set type and id
+$flexibleResource = $flexibleDocument->makeFlexibleResource('resource-type', 'resource-id');
+
 // Attach flexible resource to document
 $flexibleDocument->setData($flexibleResource); // You can put in a collection as well, all other methods are the same
 

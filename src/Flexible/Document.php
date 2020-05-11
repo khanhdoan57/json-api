@@ -113,11 +113,23 @@ class Document extends BaseDocument {
     /**
     * Make flexible resource
     *
+    * @param string Resource type
+    * @param string Resource ID
     * @return Resource
     */
-    public function makeFlexibleResource()
+    public function makeFlexibleResource($resourceType = '', $resourceId = '')
     {
-        return new Resource($this);
+        $resource = new Resource($this);
+
+        if ($resourceType) {
+            $resource->setType($resourceType);
+        }
+
+        if ($resourceId) {
+            $resource->setId($resourceId);
+        }
+
+        return;
     }
 
     /**
