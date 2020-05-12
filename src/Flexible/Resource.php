@@ -180,10 +180,14 @@ class Resource extends Abstracts\Resource {
                     
                     $relationshipData['data'] = $resource;
 
-                } elseif ($relationship['data']) {
+                } elseif ($relationshipData['data']) {
 
                     // To Many relationship
                     foreach ($relationshipData['data'] as $key => $relationship) {
+
+                        if (!is_array($relationship) or !isset($relationship['type']) or !isset($relationship['id'])) {
+                            continue;
+                        }
                         
                         $resource = $this->document->makeFlexibleResource();
                         $resource->setType($relationship['type']);
