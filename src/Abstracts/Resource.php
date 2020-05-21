@@ -225,7 +225,8 @@ abstract class Resource implements \JsonSerializable, \ArrayAccess {
     {
         if ($relationships = $this->getRelationships()) {
 
-            if (array_key_exists('id', $relationships) or array_key_exists('type', $relationships)) {
+            $relationshipsArray = is_array($relationships) ? $relationships : $relationships->toArray();
+            if (array_key_exists('id', $relationshipsArray) or array_key_exists('type', $relationshipsArray)) {
                 throw new \Exception('JSON-API resources cannot have an attribute or relationship named type or id. Check https://jsonapi.org/format/#document-resource-object-fields');
             }
 
