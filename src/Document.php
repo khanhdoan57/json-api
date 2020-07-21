@@ -238,40 +238,17 @@ class Document extends Abstracts\Document {
         }
 
         // Check duplicated objects
-        $continue = true;
+        $existingResourceHashs = [];
+        $this->included = array_filter($this->included, function($resource) use (&$existingResourceHashs) {
 
-        while ($continue) {
-
-            $found = false;
-
-            foreach ($this->included as $key => $resource) {
-
-                foreach ($this->included as $_key => $_resource) {
-                    
-                    // Skip itself
-                    if ($key === $_key) {
-                        continue;
-                    }
-
-                    // Same object - check by id and type
-                    if ((string) $resource->getType() === (string) $_resource->getType()
-                        and (string) $resource->getId() === (string) $_resource->getId()
-                    ) {
-                        $found = true;
-                        unset($this->included[$_key]);
-                    }
-
-                }
-
-                if ($found) {
-                    break;
-                }
-
+            $resourceHash = sha1($resource->getType().'__'.$resource->getId());
+            if (!in_array($resourceHash, $existingResourceHashs)) {
+                $existingResourceHashs[] = $resourceHash;
+                return true;
             }
 
-            $continue = $found ? true : false;
-
-        }
+            return false;
+        });
 
         // Re-sort included data
         $this->included = array_values($this->included);
